@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+
+
+<!-- Mirrored from techzaa.in/larkon/admin/auth-signin.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 03 Dec 2024 05:43:10 GMT -->
+<head>
+     <!-- Title Meta -->
+     <meta charset="utf-8" />
+     <title>Sign In | Larkon - Responsive Admin Dashboard Template</title>
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta name="description" content="A fully responsive premium admin dashboard template" />
+     <meta name="author" content="Techzaa" />
+     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+     <!-- App favicon -->
+     <link rel="shortcut icon" href="assets/images/favicon.ico">
+
+     <!-- Vendor css (Require in all Page) -->
+     <link href="assets/css/vendor.min.css" rel="stylesheet" type="text/css" />
+
+     <!-- Icons css (Require in all Page) -->
+     <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+
+     <!-- App css (Require in all Page) -->
+     <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" />
+
+     <!-- Theme Config js (Require in all Page) -->
+     <script src="assets/js/config.js"></script>
+     <style>
+          .error-message {
+               display: none;
+          }
+          .short-swal-popup {
+               width: 300px; 
+               padding: 0;
+               font-size: 15px;
+          }
+
+          .short-swal-content {
+               font-size: 15px;
+               margin: 0; 
+               padding: 0; 
+          }
+
+          .swal2-actions {
+               gap: 5px; 
+          }
+
+          .swal2-icon.swal2-error {
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               width: 30px; 
+               height: 30px;
+               margin: 0; 
+               font-size: 15px;
+               line-height: 30px; 
+          }
+
+          .swal2-icon.swal2-error::before {
+               content: '✖'; 
+               color: red;
+          }
+
+          .swal2-icon.swal2-success {
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               width: 30px !important; /* Smaller icon width */
+               height: 30px !important; /* Smaller icon height */
+               margin: 0 !important; /* Remove default margins */
+               font-size: 16px !important; /* Adjust font size for symbol */
+               line-height: 30px; /* Vertically align the icon */
+          }
+
+          .swal2-icon.swal2-success::before {
+               content: '✔'; /* Use a simple checkmark for the success icon */
+               color: green;
+          }
+
+          .compact-swal-popup {
+               width: auto !important; 
+               height: auto !important; 
+               padding: 20px 20px !important;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               border-radius: 8px;
+          }
+          .swal2-title {
+               font-size: 18px !important;
+               margin: 0 !important;
+               line-height: 1.5 !important;
+          }
+
+
+          .swal2-html-container {
+               margin: 0 !important; 
+          }
+
+          .swal2-timer-progress-bar {
+               height: 2px !important;
+          }
+     </style>
+</head>
+
+<body class="h-100">
+     <div class="d-flex flex-column h-100 p-3">
+          <div class="d-flex flex-column flex-grow-1">
+               <div class="row h-100">
+                    <div class="col-xxl-7">
+                         <div class="row justify-content-center h-100">
+                              <div class="col-lg-6 py-lg-5">
+                                   <div class="d-flex flex-column h-100 justify-content-center">
+                                        <div class="auth-logo mb-4">
+                                             <div class="logo-dark">
+                                                  <img src="assets/images/logo-dark.png" height="24" alt="logo dark">
+                                             </div>
+
+                                             <div class="logo-light">
+                                                  <img src="assets/images/logo-light.png" height="24" alt="logo light">
+                                             </div>
+                                        </div>
+
+                                        <h2 class="fw-bold fs-24">Sign In</h2>
+
+                                        <p class="text-muted mt-1 mb-4">Enter your email address and password to access admin panel.</p>
+
+                                        <div class="mb-5">
+                                             <form class="authentication-form">
+                                                  <div class="mb-3">
+                                                       <label class="form-label" for="email">Email</label>
+                                                       <input type="email" id="email" class="form-control bg-" placeholder="Enter your email">
+                                                       <p class="error-message text-danger mt-1" id="email-error"></p>
+                                                  </div>
+                                                  <div class="mb-3">
+                                                       <label class="form-label" for="password">Password</label>
+                                                       <input type="password" id="password"
+                                                       onkeypress="return event.charCode != 32" class="form-control" placeholder="Enter your password">
+                                                       <p class="error-message text-danger mt-1" id="password-error"></p>
+                                                  </div>
+
+                                                  <div class="mb-1 text-center d-grid">
+                                                       <button class="btn btn-soft-primary" id="login-btn" type="button">Sign In</button>
+                                                  </div>
+                                             </form>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+                    </div>
+               </div>
+          </div>
+     </div>
+
+     <!-- Vendor Javascript (Require in all Page) -->
+     <script src="assets/js/vendor.js"></script>
+
+     <!-- App Javascript (Require in all Page) -->
+     <script src="assets/js/app.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+     <script>
+          async function validateAndSubmit(event) {
+               event.preventDefault();
+               try {
+                    const formData = validateForm()
+                    if(!formData) {
+                         return;
+                    }
+                    const response = await fetch('/admin/login', {
+                         method:'POST',
+                         headers: {
+                              'content-type': 'application/json'
+                         },
+                         body:JSON.stringify(formData)
+                    });
+                    const data = await response.json();
+                    if(!response.ok) {
+                         if(response.status === 500) {
+                              window.location.href = '/errorPage';
+                         } else {
+                              throw new Error(data.message);
+                         }
+                    }
+                    if(data.success) {
+                         Swal.fire({
+                              position: "top-end",
+                              html: `
+                                   <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div>
+                                             <div class="swal2-icon swal2-success" style="width: 30px; height: 30px; margin: 0; font-size: 16px;"></div>
+                                        </div>
+                                        <div style="font-size: 20px; text-align: left;">Success!</div>
+                                   </div>
+                              `,
+                              showConfirmButton: false,
+                              timer: 1500,
+                              customClass: {
+                                   popup: 'compact-swal-popup',
+                              }
+                         })
+                         .then(() => {
+                              window.location.href = '/admin';
+                         });
+                    } 
+               } catch (error) {
+                    Swal.fire({
+                         position: "top-end",
+                         html: `
+                              <div style="display: flex; align-items: center; gap: 10px;">
+                                   <div>
+                                        <div class="swal2-icon swal2-error" style="width: 30px; height: 30px; margin: 0; font-size: 16px;"></div>
+                                   </div>
+                                   <div style="font-size: 20px; text-align: left;">Oops... ${error.message}</div>
+                              </div>
+                         `,
+                         showConfirmButton: false,
+                         timer: 1500,
+                         customClass: {
+                              popup: 'compact-swal-popup',
+                         }
+                    });
+               }
+               
+          }
+          document.getElementById('login-btn').addEventListener('click', validateAndSubmit);
+          function validateForm() {
+               clearError();
+               let isValid = true;
+               const email = document.getElementById('email').value;
+               const password = document.getElementById('password').value;
+               const emailReg = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+               if(!email || !emailReg.test(email)) {
+                    isValid = false;
+                    showError('email-error', 'Please enter a valid email, includes @ .com');
+               } 
+               if(password.length < 8 || !/[a-zA-Z]/.test(password) || !/\d/.test(password) || !/^(?!.* )/.test(password)) {
+                    isValid = false;
+                    showError('password-error', 'Please enter a valid password, includes letters, numbers, minimum 8 characters');
+               }
+               if(isValid) {
+                    return {email, password};
+               } else {
+                    return false;
+               }
+          }
+          function clearError() {
+               document.querySelectorAll('.error-message').forEach(elem => elem.style.display = 'none');
+          }
+          function showError(id, message) {
+               document.getElementById(id).innerHTML = message;
+               document.getElementById(id).style.display = 'block';
+          }
+     </script>
+</body>
+
+
+<!-- Mirrored from techzaa.in/larkon/admin/auth-signin.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 03 Dec 2024 05:43:10 GMT -->
+</html>

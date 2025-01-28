@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+
+
+<!-- Mirrored from risingtheme.com/html/demo-suruchi-v1/suruchi/login.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 23 Nov 2024 05:25:38 GMT -->
+<head>
+  <meta charset="utf-8">
+  <title>Suruchi - Account Page</title>
+  <meta name="description" content="Morden Bootstrap HTML5 Template">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.ico">
+    
+  <!-- ======= All CSS Plugins here ======== -->
+  <link rel="stylesheet" href="assets/css/plugins/swiper-bundle.min.css">
+  <link rel="stylesheet" href="assets/css/plugins/glightbox.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap" rel="stylesheet">
+
+  <!-- Plugin css -->
+  <link rel="stylesheet" href="assets/css/vendor/bootstrap.min.css">
+
+  <!-- Custom Style CSS -->
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+
+    .btn-disabled {
+      pointer-events: none;
+    }
+    .error-messge {
+      display: none;
+    }
+
+    .short-swal-popup {
+          width: 300px; 
+          padding: 0;
+          font-size: 15px;
+    }
+
+    .short-swal-content {
+          font-size: 15px;
+          margin: 0; 
+          padding: 0; 
+    }
+
+    .swal2-actions {
+          gap: 5px; 
+    }
+
+    .swal2-icon.swal2-error {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 30px; 
+          height: 30px;
+          margin: 0; 
+          font-size: 15px;
+          line-height: 30px; 
+    }
+
+    .swal2-icon.swal2-error::before {
+          content: '✖'; 
+          color: red;
+    }
+
+    .swal2-icon.swal2-success {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 30px !important; 
+          height: 30px !important; 
+          margin: 0 !important; 
+          font-size: 16px !important; 
+          line-height: 30px; 
+    }
+
+    .swal2-icon.swal2-success::before {
+          content: '✔'; 
+          color: green;
+    }
+
+    .compact-swal-popup {
+          width: auto !important; 
+          height: auto !important; 
+          padding: 20px 20px !important;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 8px;
+    }
+    .swal2-title {
+          font-size: 18px !important;
+          margin: 0 !important;
+          line-height: 1.5 !important;
+    }
+
+
+    .swal2-html-container {
+          margin: 0 !important; 
+    }
+
+    .swal2-timer-progress-bar {
+          height: 2px !important;
+    }
+
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.1); 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        backdrop-filter: blur(0.5px);
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .spinner {
+        border: 4px solid #f3f3f3; 
+        border-top: 4px solid red; 
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+    }
+
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+
+  .blurred {
+      filter: blur(0.5px);
+      pointer-events: none; 
+  }
+
+    .password-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .eye-button {
+        position: absolute;
+        right: 10px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+        font-size: 18px; 
+        outline: none;
+    }
+
+    .eye {
+        width: 20px;
+        height: 20px;
+        display: block;
+        background-repeat: no-repeat;
+        background-size: contain;
+    }
+    .open-eye {
+        background-image: url('https://cdn-icons-png.flaticon.com/512/159/159604.png'); /* Open eye icon */
+    }
+
+    .closed-eye {
+        background-image: url('https://cdn-icons-png.flaticon.com/512/565/565655.png'); /* Closed eye icon */
+    }
+
+
+  </style>
+</head>
+
+<body>
+        <!-- Start login section  -->
+        <div class="login__section section--padding">
+            <div class="container">
+                <form>
+                    <div class="login__section--inner">
+                        <div class="row row-cols-md-2 row-cols-1 justify-content-center">
+                            <div class="col">
+                                <div class="account__login register">
+                                    <div class="account__login--header mb-25">
+                                        <h2 class="account__login--header__title h3 mb-10">Create an Account</h2>
+                                        <p class="account__login--header__desc">Register here if you are a new customer</p>
+                                    </div>
+                                    <div class="account__login--inner">
+                                        <label for="name">Full name</label>
+                                        <input class="account__login--input mb-1" placeholder="name" type="text" id="name">
+                                        <p id="name-error" class="error-message text-danger"></p>
+
+                                        <label for="email">Email Address</label>
+                                        <input class="account__login--input mb-1" placeholder="Email Address" type="email" id="email">
+                                        <p id="email-error" class="error-message text-danger"></p>
+
+                                        <label for="password">Password</label>
+                                        <div class="password-wrapper">
+                                          <input class="account__login--input mb-1" onkeypress="return event.charCode != 32" placeholder="Password" type="password" id="password">
+                                          <button type="button" id="toggle-password" class="eye-button">
+                                            <span id="eye-icon0" class="eye closed-eye"></span>
+                                          </button>
+                                        </div>
+                                        <p id="password-error" class="error-message text-danger"></p>
+
+                                        <label for="confirm-password">Confirm Password</label>
+                                        <div class="password-wrapper">
+                                          <input class="account__login--input mb-1" onkeypress="return event.charCode != 32" placeholder="Confirm Password" type="password" id="confirm-password">
+                                          <button type="button" id="toggle-cpassword" class="eye-button">
+                                            <span id="eye-icon1" class="eye closed-eye"></span>
+                                          </button>
+                                        </div>
+                                      
+                                        <p id="cpassword-error" class="error-message text-danger"></p>
+                                        <% if(locals.message && message.length > 0) { %>
+                                          <div class="alert alert-danger text-center"><%= message %></div>
+                                        <% } %>
+                                        <button id="signup-btn" class="account__login--btn primary__btn mb-10" type="button">Submit & Register</button>
+                                        <div class="account__login--divide">
+                                          <span class="account__login--divide__text">OR</span>
+                                      </div>
+                                      <div class="account__social d-flex justify-content-center mb-15">
+                                          <a class="account__social--link google" id="google-btn" href="/auth/google">Google</a>
+                                      </div>
+                                      <p class="account__login--signup__text">Already Have an Account? <a href="/login">Log in now</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>     
+        </div>
+        <div id="loading-overlay" class="loading-overlay hidden">
+          <div class="spinner"></div>
+        </div>
+        <!-- End login section  -->
+    </main>
+
+    
+
+
+
+    
+  <!-- All Script JS Plugins here  -->
+  <script src="assets/js/vendor/popper.js" defer="defer"></script>
+  <script src="assets/js/vendor/bootstrap.min.js" defer="defer"></script>
+  <script src="assets/js/plugins/swiper-bundle.min.js"></script>
+  <script src="assets/js/plugins/glightbox.min.js"></script>
+
+  <!-- Customscript js -->
+  <script src="assets/js/script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <script>
+    async function validateAndSubmit(event) {
+      document.getElementById('signup-btn').classList.add('btn-disabled');
+      event.preventDefault();
+      clearError();
+      const formData = validateForm();
+      if(!formData) {
+          document.getElementById('signup-btn').classList.remove('btn-disabled');
+          return;
+        }
+      document.getElementById("loading-overlay").classList.remove('hidden');
+      document.body.classList.add('blurred');
+      try {     
+        const response = await fetch('/signup', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json'
+          },
+          body:JSON.stringify(formData)
+        });
+        const data = await response.json();
+        if(!response.ok) {
+          throw new Error(data.message);
+        }
+        if(data.success) {
+          document.getElementById("loading-overlay").classList.add('hidden');
+          document.body.classList.remove('blurred');
+          Swal.fire({
+            position: "top-end",
+            html: `
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                      <div>
+                            <div class="swal2-icon swal2-success" style="width: 30px; height: 30px; margin: 0; font-size: 16px;"></div>
+                      </div>
+                      <div style="font-size: 20px; text-align: left;">Success!</div>
+                  </div>
+            `,
+            showConfirmButton: false,
+            timer: 1500,
+            customClass: {
+                  popup: 'compact-swal-popup',
+            }
+          })
+          .then(() => {
+              window.location.href = '/otp';
+              document.getElementById('signup-btn').classList.remove('btn-disabled');
+          });
+        } 
+      } catch (error) {
+        document.getElementById('signup-btn').classList.remove('btn-disabled');
+        document.getElementById("loading-overlay").classList.add('hidden');
+        document.body.classList.remove('blurred');
+        Swal.fire({
+              position: "top-end",
+              html: `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div>
+                              <div class="swal2-icon swal2-error" style="width: 30px; height: 30px; margin: 0; font-size: 16px;"></div>
+                        </div>
+                        <div style="font-size: 20px; text-align: left;">Oops... ${error.message}</div>
+                    </div>
+              `,
+              showConfirmButton: false,
+              timer: 1500,
+              customClass: {
+                    popup: 'compact-swal-popup',
+              }
+          });
+      }
+    }
+
+    document.getElementById('signup-btn').addEventListener('click', validateAndSubmit);
+
+    function validateForm() {
+      let isValid = true;
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const cpassword = document.getElementById('confirm-password').value;
+      const emailReg = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      if(name.trim() === "") {
+        isValid = false;
+        showError('name-error', 'Please enter a valid name.');
+      } else if(!/^[A-Za-z\s]+$/.test(name)) {
+        isValid = false;
+        showError('name-error', 'Name can only contain alphabets and spaces.');
+      }
+      if(email.trim() === "") {
+        isValid = false;
+        showError('email-error', 'Please enter a email address.');
+      } else if(!emailReg.test(email)) {
+        isValid = false;
+        showError('email-error', 'Please enter a valid email, includes @ .com');
+      } 
+      if(password.length < 8) {
+        isValid = false;
+        showError('password-error', 'Password should contain atleast 8 characters.');
+      } else if(!/[a-zA-Z]/.test(password)) {
+        isValid = false;
+        showError('password-error', 'Password should contain alphabets.');
+      } else if(!/\d/.test(password)) {
+        isValid = false;
+        showError('password-error', 'Password should contain numbers.');
+      }
+      if(password !== cpassword) {
+        isValid = false;
+        showError('cpassword-error', 'Password do not match.');
+      }
+      if(isValid) {
+        return {
+          name, 
+          email, 
+          password, 
+          cpassword
+        };
+      } else {
+        return false;
+      }
+    }
+    function clearError() {
+      document.querySelectorAll('.error-message').forEach(element => element.style.display = 'none');
+    }
+    function showError(id, message) {
+      document.getElementById(id).innerHTML = message;
+      document.getElementById(id).style.display = 'block';
+    }
+
+    document.getElementById('google-btn').addEventListener('click', () => {
+      document.getElementById("loading-overlay").classList.remove('hidden');
+      document.body.classList.add('blurred');
+
+
+      setInterval(() => {
+        document.getElementById("loading-overlay").classList.add('hidden');
+        document.body.classList.remove('blurred');
+      }, 2000);
+    })
+
+    const password = document.getElementById('password');
+    const passToggleButton = document.getElementById('toggle-password');
+    const passEyeIcon = document.getElementById('eye-icon0');
+
+    const cpassword = document.getElementById('confirm-password');
+    const cpassToggleButton = document.getElementById('toggle-cpassword');
+    const cpassEyeIcon = document.getElementById('eye-icon1');
+
+    passToggleButton.addEventListener('click', () => {
+      const isPasswordVisible = password.type === 'text';
+      password.type = isPasswordVisible ? 'password' : 'text';
+
+      // Toggle the icon class
+      passEyeIcon.classList.toggle('open-eye', !isPasswordVisible);
+      passEyeIcon.classList.toggle('closed-eye', isPasswordVisible);
+    });
+
+    cpassToggleButton.addEventListener('click', () => {
+      const isPasswordVisible = cpassword.type === 'text';
+      cpassword.type = isPasswordVisible ? 'password' : 'text';
+
+      // Toggle the icon class
+      cpassEyeIcon.classList.toggle('open-eye', !isPasswordVisible);
+      cpassEyeIcon.classList.toggle('closed-eye', isPasswordVisible);
+    });
+
+  </script>
+
+</body>
+
+<!-- Mirrored from risingtheme.com/html/demo-suruchi-v1/suruchi/login.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 23 Nov 2024 05:25:38 GMT -->
+</html>

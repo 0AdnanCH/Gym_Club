@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+
+
+<!-- Mirrored from risingtheme.com/html/demo-suruchi-v1/suruchi/login.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 23 Nov 2024 05:25:38 GMT -->
+<head>
+<meta charset="utf-8">
+<title>Suruchi - Account Page</title>
+<meta name="description" content="Morden Bootstrap HTML5 Template">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.ico">
+  
+<!-- ======= All CSS Plugins here ======== -->
+<link rel="stylesheet" href="assets/css/plugins/swiper-bundle.min.css">
+<link rel="stylesheet" href="assets/css/plugins/glightbox.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap" rel="stylesheet">
+
+<!-- Plugin css -->
+<link rel="stylesheet" href="assets/css/vendor/bootstrap.min.css">
+
+<!-- Custom Style CSS -->
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+.otp-modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.otp-modalContent {
+  border: 1px solid #888;
+  width: 100%;
+  background-color: white;
+  height: 100%;
+}
+.error-message {
+  display: none;
+}
+
+.edit-profile-col {
+    width: 100%;
+}
+.custom-swal-popup .swal2-html-container {
+    font-size: 20px;
+}
+.resend-disabled {
+      pointer-events: none;
+      opacity: 0.6;
+}
+
+.btn-disabled {
+   pointer-events: none;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.1); 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(0.5px);
+}
+
+    .hidden {
+      display: none;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3; 
+      border-top: 4px solid red; 
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+          transform: rotate(0deg);
+      }
+      100% {
+          transform: rotate(360deg);
+      }
+    }
+
+  .blurred {
+    filter: blur(0.5px);
+    pointer-events: none; 
+  }
+
+</style>
+</head>
+
+<body>
+      
+      <!-- Start login section  -->
+      <div class="login__section section--padding">
+          <div class="container">
+              <form onsubmit="return formSubmit(event)">
+                  <div class="login__section--inner">
+                      <div class="row row-cols-md-2 row-cols-1 justify-content-center">
+                          <div class="col">
+                              <div class="account__login">
+                                  <div class="account__login--header mb-25">
+                                      <h2 class="account__login--header__title h3 mb-10">Forgot Password?</h2>
+                                      <p class="account__login--header__desc">No problem. Enter your account email address.</p>
+                                  </div>
+                                  <div class="account__login--inner">
+                                      <label for="email"></label>
+                                      <input class="account__login--input" id="email" placeholder="Email Addres" type="text">
+                                      <div class="text-danger error-message mb-3" id="email-error"></div>
+                                      <button id="reset-btn" class="account__login--btn primary__btn mb-3" type="submit">Reset Password</button>
+                                      <% if(user) { %>
+                                        <p class="account__login--signup__text"><a href="/account">Back to Account</a></p>
+                                      <% } else { %>
+                                        <p class="account__login--signup__text"><a href="/login">Back to Login</a></p>
+                                      <% } %>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </form>
+          </div>     
+      </div>
+      <!-- End login section  -->
+      <!-- modal for otp -->
+      <div class="otp-modal" id="otp-modal">
+        <div class="otp-modalContent d-flex justify-content-center align-items-center">
+          <div style="width: 25%;">
+            <div class="card p-4 shadow-lg">
+              <h4 class="card-title text-center">OTP Verification</h4>
+              <p class="text-muted text-center">Enter the 6-digit OTP sent to your email/phone</p>
+              
+              <form id="otp-form" onsubmit="return validateOTPForm(event)">
+                <div class="mb-3">
+                  <input 
+                    type="text" 
+                    id="otp"
+                    class="form-control text-center h5" 
+                    maxlength="6" 
+                    placeholder="Enter OTP" 
+                  >
+                </div>
+                <p id="otp-error" class="text-danger error-message"></p>
+                <button type="submit" class="btn btn-primary w-100 h4">Verify</button>
+              </form>
+        
+              <div class="text-center mt-3">
+                <span id="timer">Resend OTP in <strong>30</strong> seconds</span>
+                <button id="resend-btn" class="btn btn-link resend-disabled h4" type="button" onclick="resendOTP()">Resend OTP</button>
+              </div>
+            </div>
+          </div>
+            </div>     
+    </div>
+  </main>
+  <div id="loading-overlay" class="loading-overlay hidden">
+    <div class="spinner"></div>
+  </div>
+  
+  <!-- Scroll top bar -->
+  <button id="scroll__top"><svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="48" d="M112 244l144-144 144 144M256 120v292"/></svg></button>
+
+  
+<!-- All Script JS Plugins here  -->
+<script src="assets/js/vendor/popper.js" defer="defer"></script>
+<script src="assets/js/vendor/bootstrap.min.js" defer="defer"></script>
+<script src="assets/js/plugins/swiper-bundle.min.js"></script>
+<script src="assets/js/plugins/glightbox.min.js"></script>
+
+<!-- Customscript js -->
+<script src="assets/js/script.js"></script>
+<script>
+
+  let timer = 30;
+  let timerInterval;
+  const timerElement = document.getElementById('timer');
+  const resendBtn = document.getElementById('resend-btn');
+  function startTimer() {
+    timerInterval = setInterval(() => {
+      timer--;
+      timerElement.innerHTML = `Resend OTP in <strong>${timer}</strong> seconds`;
+      if (timer <= 0) {
+      clearInterval(timerInterval);
+      timerElement.innerHTML = "";
+      resendBtn.classList.remove('resend-disabled');
+      resendBtn.disabled = false;
+    }
+    },1000)
+  }
+
+  async function formSubmit(event) {
+    event.preventDefault();
+    try {
+      document.getElementById('reset-btn').classList.add('btn-disabled');
+      if(!emailValidation()) {
+        document.getElementById('reset-btn').classList.remove('btn-disabled');
+        return
+      }
+      document.getElementById("loading-overlay").classList.remove('hidden');
+      document.body.classList.add('blurred');
+      const email = document.getElementById('email').value;
+      const otpModal = document.getElementById('otp-modal');
+      const response = await fetch('/forgotPassword', {
+        method: 'POST', 
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({email})
+      });
+      const data = await response.json();
+      if(!response.ok) {
+        throw new Error(data.message);
+      }
+      if(data.success) {
+        document.getElementById("loading-overlay").classList.add('hidden');
+        document.body.classList.remove('blurred');
+        Swal.fire({
+          position: "top-end",
+          icon: 'success',
+          title: 'OTP send Successfully',
+          showConfirmButton: false,
+          timer: 1500,
+          customClass: {
+            popup: 'custom-swal-popup'
+        }
+        })
+        .then(() => {
+          otpModal.style.display = 'block';
+          startTimer();
+          document.getElementById('reset-btn').classList.remove('btn-disabled');
+        })
+      }
+    } catch (error) {
+      document.getElementById('reset-btn').classList.remove('btn-disabled');
+      document.getElementById("loading-overlay").classList.add('hidden');
+      document.body.classList.remove('blurred');
+      Swal.fire({
+        position: "top-end",
+        icon: "error",
+        title: "Oops...",
+        text: error.message,
+        showConfirmButton: false,
+        timer: 1500,
+        customClass: {
+            popup: 'custom-swal-popup'
+        }
+      });
+    }
+  }
+  async function validateOTPForm(event) {
+      event.preventDefault();
+      try {
+        const otpError = document.getElementById('otp-error');
+        otpError.style.display = 'none';
+        const otpInput = document.getElementById('otp').value;
+        if(!otpInput || otpInput.length<6) {
+          otpError.innerHTML = 'Enter a valid OTP number.';
+          otpError.style.display = 'block';
+          return;
+        } else if (!/^\d+$/.test(otpInput)) {
+          otpError.innerHTML = 'Enter a valid OTP number.';
+          otpError.style.display = 'block';
+          return;
+        }
+        const response = await fetch('/passwordOtp', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify({otpInput})
+        })
+        const data = await response.json();
+        if(!response.ok) {
+          throw new Error(data.message);
+        }
+        if(data.success) {
+          Swal.fire({
+            position: "top-end",
+            icon: 'success',
+            title: 'OTP Verified Successfully',
+            showConfirmButton: false,
+            timer: 1500,
+            customClass: {
+              popup: 'custom-swal-popup'
+          }
+          })
+          .then(() => {
+            window.location.href = data.redirectUrl;
+          });
+        }
+      } catch (error) {
+        Swal.fire({
+          position: "top-end",
+          icon: "error",
+          title: "Oops...",
+          text: error.message,
+          showConfirmButton: false,
+          timer: 1500,
+          customClass: {
+              popup: 'custom-swal-popup'
+          }
+        });
+      }
+    }
+    async function resendOTP() {
+      try {
+        clearInterval(timerInterval);
+        timer = 31;
+        resendBtn.classList.add('resend-disabled');
+        resendBtn.disabled = true;
+        timerElement.innerHTML = "";
+        const response = await fetch('/passwordResentOtp', { method: 'POST' });
+        startTimer();
+        const data = await response.json();
+        if(!response.ok) {
+          if(data.redirectUrl) {
+            return window.location.reload();
+          }
+          throw new Error(data.message);
+        }
+        if(data.success) {
+          Swal.fire({
+            position: "top-end",
+            icon: 'success',
+            title: 'OTP resend Successfully',
+            showConfirmButton: false,
+            timer: 1500,
+            customClass: {
+              popup: 'custom-swal-popup'
+            }
+          });
+        }
+      } catch (error) {
+        Swal.fire({
+          position: "top-end",
+          icon: "error",
+          title: "Oops...",
+          text:error.message,
+          showConfirmButton: false,
+          timer: 1500,
+          customClass: {
+              popup: 'custom-swal-popup'
+          }
+        });
+      }
+    }
+
+    function emailValidation() {
+      let isValid = true;
+      const email = document.getElementById('email').value;
+      const emailError = document.getElementById('email-error');
+
+      emailError.textContent = '';
+      emailError.style.display = 'none';
+
+      const emailReg = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+
+      if(!emailReg.test(email)) {
+        isValid = false;
+        emailError.textContent = 'Please enter a valid email, includes @ .com';
+        emailError.style.display = 'block';
+      }
+      return isValid
+    }
+</script>
+</body>
+
+<!-- Mirrored from risingtheme.com/html/demo-suruchi-v1/suruchi/login.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 23 Nov 2024 05:25:38 GMT -->
+</html>
