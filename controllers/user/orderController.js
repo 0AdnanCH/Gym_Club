@@ -810,6 +810,7 @@ const paymentFailed = async (req, res) => {
 
 const handleWebhook = async (req, res) => {
   try {
+    console.log('dkfdkfjkdfjdkjk')
     const { event, payload } = req.body;
     if(event === 'payment.failed') {
      await Order.updateOne({razorpayOrderId: payload.payment.entity.order_id, paymentStatus: {$ne: 'Failed'}}, {$set: {paymentStatus: 'Failed'}}); 

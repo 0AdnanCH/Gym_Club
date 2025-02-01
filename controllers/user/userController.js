@@ -39,12 +39,8 @@ const loadHomepage = async (req, res) => {
         item.offerApplied = await allProductOffer(item.offerApplied, cate.offerApplied, item.salePrice);
       }
     }
-    if(user) {
-      const userData = await User.findOne({_id:user});
-      res.render('home', {user: userData, product});
-    } else {
-      return res.render('home',{product}); 
-    }
+    res.render('home', {product});
+    
   } catch (error) {
     console.log('Failed to load home page', error);
     res.redirect('/errorPage');
@@ -251,14 +247,10 @@ const logout = async (req, res) => {
 
 const loadShoppingPage = async (req, res) => {
   try {
-    const userId = req.session.user;
     const sort = req.query.sort || 'new';
     const search = req.query.search || '';
     const page = parseInt(req.query.page) || 1;
     const categories  = req.query.categories; 
-    if(userId) {
-      var user = await User.findOne({_id:userId, isBlocked:false});
-    }
     let sortby = {}
     if(sort === 'price_dec') {
       sortby = {salePrice:-1, createdAt: -1}
@@ -324,7 +316,6 @@ const loadShoppingPage = async (req, res) => {
     const totalPages = Math.ceil(totalProducts/limit);
     const categoryInfo = category.map(category => ({_id:category._id,name:category.name}));
     res.render('shop', {
-      user,
       product,
       category:categoryInfo,
       totalPages,
@@ -349,7 +340,7 @@ const profileInformation = async (req, res) => {
       const userId = req.session.user
       const passport = req.session.passport
       const userData = await User.findOne({_id:userId, isBlocked:false});
-      res.render('profile-information', {user:userData, passport});
+      res.render('profile-information', {userData, passport});
     }
   } catch (error) {
     res.redirect('/pageNotFound');

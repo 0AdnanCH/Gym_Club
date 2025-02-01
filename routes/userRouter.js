@@ -92,7 +92,7 @@ router.patch('/cancelOrder', userAuth, orderController.cancelOrder);
 router.post('/createOrder', userAuth, orderController.createOrder);
 router.post('/verifyPayment', userAuth, orderController.verifyPayment);
 // router.post('/payment-failed', userAuth, orderController.paymentFailed)
-router.post('/payment/webhook', userAuth, orderController.handleWebhook);
+router.post('/payment/webhook', orderController.handleWebhook);
 router.patch('/changeItemstatus', userAuth, orderController.changeItemStatus);
 router.post('/returnOrder', userAuth, orderController.returnOrders);
 router.patch('/cancelReturn', userAuth, orderController.cancelReturn);

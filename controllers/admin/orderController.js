@@ -43,7 +43,8 @@ const getOrder = async (req, res) => {
       order,
       currentPage:page,
       totalPages: Math.ceil(count/limit),
-      returnReq
+      returnReq,
+      heading: 'orders list'
     });
   } catch (error) {
    console.log('Get Order Error', error);
@@ -58,7 +59,7 @@ const getOrderDetails = async (req, res) => {
     .populate('items.productId', 'productName')
     .populate('userId', 'email name')
     .exec();
-    res.render('admin-orderDetails', {order});
+    res.render('admin-orderDetails', {order, heading: 'Order Details'});
   } catch (error) {
     res.redirect('/admin/pageError');
   }

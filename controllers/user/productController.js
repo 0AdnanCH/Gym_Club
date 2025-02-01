@@ -7,7 +7,6 @@ const {allProductOffer} = require('../user/userController');
 const productDetails = async (req, res) => {
   try {
     const userId = req.session.user;
-    const user = await User.findById(userId);
     const productId = req.query.id;
     const product = await Product.findById(productId)
     .populate('category')
@@ -22,7 +21,6 @@ const productDetails = async (req, res) => {
     }
     product.offerApplied = await allProductOffer(product.offerApplied, category.offerApplied, product.salePrice);
     res.render('product-details', {
-      user,
       product,
       category
     })

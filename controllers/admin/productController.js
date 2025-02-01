@@ -10,7 +10,7 @@ const sharp = require('sharp');
 const getAddProduct = async (req, res) => {
   try {
     const category = await Category.find({isListed: true});
-    res.render('product-add', {cat: category})
+    res.render('product-add', {cat: category, heading: 'Create Product'});
   } catch (error) {
     console.log('Product Add Error', error);
     res.redirect('/admin/pageError');
@@ -137,7 +137,8 @@ const getAllProducts = async (req, res) => {
       data: productData,
       currentPage: page,
       totalPages: Math.ceil(count/limit),
-    })
+      heading: 'Product List'
+    });
 
   } catch (error) {
     console.error('Product Get Error', error);
@@ -181,7 +182,7 @@ const getEditProduct = async (req, res) => {
     .populate('category', 'name').exec();
     const category = await Category.find({isListed: true});
     let index = 0
-    res.render('product-edit', {product, category, index});
+    res.render('product-edit', {product, category, index, heading: 'Product Edit'});
   } catch (error) {
     console.error('Get Edit Product Error', error);
     res.redirect('/admin/pageError');
@@ -465,7 +466,7 @@ const getProductDetails = async (req, res) => {
         product.offerApplied = category.offerApplied;
       }
     }
-    res.render('adminProduct-details', {product, offerPrice, cateName:category.name});
+    res.render('adminProduct-details', {product, offerPrice, cateName:category.name, heading: 'Product Details'});
   } catch (error) {
     console.error('Admin Product Details Error', error);
     res.redirect('/admin/pageError');

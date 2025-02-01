@@ -4,7 +4,7 @@ const Product = require('../../models/productSchema');
 
 const getAddCoupon = async (req, res) => {
   try {
-    res.render('coupon-add');
+    res.render('coupon-add', {heading: 'Coupons Add'});
   } catch (error) {
     console.log('Get Coupon Add Error', error);
     res.redirect('/admin/pageError');
@@ -39,7 +39,8 @@ const getCoupon = async (req, res) => {
     res.render('coupon-list', {
       coupon,
       currentPage:page,
-      totalPages: Math.ceil(count/limit)
+      totalPages: Math.ceil(count/limit),
+      heading: 'Coupons'
     });
   } catch (error) {
     console.log('Get Coupon List Error', error);

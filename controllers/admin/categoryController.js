@@ -16,7 +16,8 @@ const categoryInfo = async (req, res, next) => {
     res.render('category', {
       category: categoryData,
       currentPage: page,
-      totalPages
+      totalPages,
+      heading: 'Categories List'
     });
   } catch (error) {
     res.redirect('/admin/pageError');
@@ -43,7 +44,7 @@ const addCategory = async (req, res) => {
 }
 const loadAddCategory = async (req, res) => {
   try {
-    res.render('category-add');
+    res.render('category-add', {heading: 'Create Category'});
   } catch (error) {
     console.log('category add load error', error);
     res.redirect('/admin/pageError');
@@ -73,7 +74,7 @@ const getEditCategory = async (req, res) => {
   try {
     const id = req.query.id;
     const category = await Category.findOne({_id: id});
-    res.render('category-edit', {category});
+    res.render('category-edit', {category, heading: 'Category Edit'});
   } catch (error) {
     console.log('Get Category Error', error);
     res.redirect('/admin/pageError');

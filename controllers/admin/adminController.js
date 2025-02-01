@@ -53,13 +53,10 @@ const loadDashboard = async (req, res) => {
       ]);
   
       const result = salesData.length > 0 ? salesData[0] : { totalOrders: 0, totalSalesCount: 0, totalSalesAmount: 0 };
-      // const monthlyData = await getMonthlyOrderCounts();
-      // const orderCounts = monthlyData.map(data => data.orderCount || 0); 
-      // const completeOrderCounts = Array(12).fill(0).map((_, index) => orderCounts[index] || 0);
 
       const order = await Order.find().sort({createdAt: -1}).limit(5).populate('userId', 'name').exec();
 
-      res.render('dashboard', { order, result });
+      res.render('dashboard', { order, result, heading: 'Welcome!'});
     } else {
       res.redirect('/admin/login');
     }
@@ -71,14 +68,11 @@ const loadDashboard = async (req, res) => {
 
 const yearChart = async (req, res) => {
   try {
-    console.log('kjfkdjkd')
     const year = req.query.year;
     const monthlyData = await getMonthlyOrderCounts(year);
-    console.log(monthlyData)
     const orderCounts = monthlyData.map(data => data.orderCount || 0); 
     const completeOrderCounts = Array(12).fill(0).map((_, index) => orderCounts[index] || 0);
-    console.log(completeOrderCounts)
-    res.status(200).json({ success: true, orderCounts: completeOrderCounts})
+    res.status(200).json({ success: true, orderCounts: completeOrderCounts});
   } catch (error) {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
@@ -429,7 +423,7 @@ const salesReport = async (req, res, next) => {
       });
     }
 
-    res.render('sales-report', {result, total});
+    res.render('sales-report', {result, total, heading: 'SALES REPORT'});
   } catch (error) {
     res.redirect('/admin/pageError');
   }

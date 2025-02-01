@@ -28,47 +28,9 @@
 
 <body>
 
-    <!-- Start preloader -->
-    <div id="preloader">
-        <div id="ctn-preloader" class="ctn-preloader">
-            <div class="animation-preloader">
-                <div class="spinner"></div>
-                <div class="txt-loading">
-                    <span data-text-preloader="L" class="letters-loading">
-                        L
-                    </span>
-                    
-                    <span data-text-preloader="O" class="letters-loading">
-                        O
-                    </span>
-                    
-                    <span data-text-preloader="A" class="letters-loading">
-                        A
-                    </span>
-                    
-                    <span data-text-preloader="D" class="letters-loading">
-                        D
-                    </span>
-                    
-                    <span data-text-preloader="I" class="letters-loading">
-                        I
-                    </span>
-                    
-                    <span data-text-preloader="N" class="letters-loading">
-                        N
-                    </span>
-                    
-                    <span data-text-preloader="G" class="letters-loading">
-                        G
-                    </span>
-                </div>
-            </div>	
-
-            <div class="loader-section section-left"></div>
-            <div class="loader-section section-right"></div>
-        </div>
-    </div>
-    <!-- End preloader -->
+     <!-- Start preloader -->
+     <%- include('../partials/user/preloader.ejs') %>
+     <!-- End preloader -->
 
     <main class="main__content_wrapper">
 
@@ -95,8 +57,6 @@
 
     
   <!-- All Script JS Plugins here  -->
-  <!-- <script src="assets/js/vendor/popper.js" defer="defer"></script> -->
-  <!-- <script src="assets/js/vendor/bootstrap.min.js" defer="defer"></script> -->
 
   <script src="assets/js/plugins/swiper-bundle.min.js"></script>
   <script src="assets/js/plugins/glightbox.min.js"></script>

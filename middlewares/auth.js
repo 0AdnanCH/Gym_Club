@@ -8,7 +8,7 @@ const userAuth = async (req, res, next) => {
       if(!user) {
         req.session.user = null;
       } else {
-        res.locals.userName = user.name;
+        res.locals.user = user.name;
       }
       next();
     } else {

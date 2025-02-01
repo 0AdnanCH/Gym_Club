@@ -8,7 +8,7 @@ const getAddOffer = async (req, res) => {
   try {
     const categories = await Category.find({isListed: true}, {name:1});
     const products = await Product.find({isBlocked: false, category:{$in:categories.map(category => category._id)}}, {productName:1});
-    res.render('offer-add', {categories, products});
+    res.render('offer-add', {categories, products, heading: 'Offers Add'});
   } catch (error) {
     console.error('Get Create Offer Error', error);
     res.redirect('/admin/pageError');
@@ -31,7 +31,8 @@ const getOffer = async (req, res) => {
     res.render('offer-list', {
       offers,
       currentPage:page,
-      totalPages: Math.ceil(count/limit)
+      totalPages: Math.ceil(count/limit),
+      heading: 'Offers'
     });
   } catch (error) {
     console.error('Get Offer Error', error);
