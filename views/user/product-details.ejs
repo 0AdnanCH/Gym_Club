@@ -124,21 +124,17 @@
 
                                 </div>
                             </div>
-                            <div class="product__media--nav swiper">
-                                <div class="swiper-wrapper">
+                            <div class="product__media--nav">
+                                <div class="d-flex justify-content-center">
                                     <!-- slider image -->
                                     <% for(let i=0; i<product.variant[0].image.length;i++) { %>
-                                        <div class="swiper-slide">
-                                            <div class="product__media--nav__items">
-                                                <img class="product__media--nav__items--img"
-                                                    src="<%= product.variant[0].image[i] %>"
-                                                    onclick="changeMainImage(this, 0)" alt="product-nav-img">
-                                            </div>
+                                        <div>
+                                            <img style="width: 120px; height: auto;" class="product__media--nav__items--img mx-2" 
+                                                src="<%= product.variant[0].image[i] %>"
+                                                onclick="changeMainImage(this, 0)" alt="product-nav-img">
                                         </div>
-                                        <% } %>
+                                    <% } %>
                                 </div>
-                                <div class="swiper__nav--btn swiper-button-next"></div>
-                                <div class="swiper__nav--btn swiper-button-prev"></div>
                             </div>
                         </div>
                     </div>
@@ -159,22 +155,18 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="product__media--nav swiper">
-                                    <div class="swiper-wrapper">
+                                <div class="product__media--nav">
+                                    <div class="d-flex justify-content-center">
                                         <!-- slider image -->
                                         <% for(let j=0; j<product.variant[i].image.length;j++) { %>
-                                            <div class="swiper-slide">
-                                                <div class="product__media--nav__items">
-                                                    <img class="product__media--nav__items--img"
-                                                        src="<%= product.variant[i].image[j] %>"
-                                                        onclick="changeMainImage(this , '<%= i %>')"
-                                                        alt="product-nav-img">
-                                                </div>
+                                            <div>
+                                                <img style="width: 120px; height: auto;" class="product__media--nav__items--img mx-2"
+                                                    src="<%= product.variant[i].image[j] %>"
+                                                    onclick="changeMainImage(this , '<%= i %>')"
+                                                    alt="product-nav-img">
                                             </div>
-                                            <% } %>
+                                        <% } %>
                                     </div>
-                                    <div class="swiper__nav--btn swiper-button-next"></div>
-                                    <div class="swiper__nav--btn swiper-button-prev"></div>
                                 </div>
                             </div>
                         </div>
@@ -430,7 +422,7 @@
     <!-- All Script JS Plugins here  -->
     <script src="assets/js/vendor/popper.js" defer="defer"></script>
     <script src="assets/js/vendor/bootstrap.min.js" defer="defer"></script>
-    <script src="assets/js/plugins/swiper-bundle.min.js"></script>
+    <!-- <script src="assets/js/plugins/swiper-bundle.min.js"></script> -->
     <script src="assets/js/plugins/glightbox.min.js"></script>
 
 
