@@ -133,7 +133,7 @@
                                 download invoice
                             </button>
                             <% if(order.paymentMethod === 'razorpay' && (order.paymentStatus === 'Pending' || order.paymentStatus === 'Failed')) { %>
-                            <button class="btn btn-success" onclick="continueRazorpay(event)">
+                            <button class="btn btn-success" id="razorpay-pay-btn">
                                 Continue Pay
                             </button>
                             <% } %>
@@ -266,7 +266,7 @@
                   </div>
                 </div>
                 <% if(order.orderStatus === 'Pending' || order.orderStatus === 'Confirmed' || order.orderStatus === 'Shipped') { %>
-                <button id="cancel-btn" onclick="return orderCancellation(event, '<%= order._id %>')" class="btn btn-danger cancel-btn" type="button">Cancel</button>
+                <button id="cancel-btn" class="btn btn-danger cancel-btn" type="button">Cancel</button>
                 <% } else if(order.orderStatus === 'Delivered' && !allRejected && !aldreadyChangeStatus ) { %>
                     <% if(returnAllitem) { %>
                         <button id="return-btn" class="checkout__discount--code__btn primary__btn border-radius-5 return-btn d-none" type="button">Return</button>
@@ -419,7 +419,7 @@
                             </div>
                         </div>
                         <div class="d-flex justify-content-between mt-5 mb-0">
-                            <button class="btn btn-danger h4" onclick="returnOrder(true)" type="button">Confirm Return</button>
+                            <button class="btn btn-danger h4" id="return-order-btn" type="button">Confirm Return</button>
                             <button class="btn btn-success h4" type="button" id="return-cancel-btn">Cancel</button>
                         </div>
                     </div>
@@ -478,48 +478,53 @@
   <!-- Customscript js -->
   <script src="assets/js/script.js"></script>
   <script>
-    async function orderCancellation(event, id) {
-      event.preventDefault();
-      try {
-        const response = await fetch(`/cancelOrder?id=${id}`, { method: 'PATCH' });
-        const data = await response.json();
-        if(!response.ok) {
-            throw new Error(data.message);
-        }
-        if(data.success) {
-            Swal.fire({
-              position: "top-end",
-              icon: 'success',
-              title: 'Order canceled successfully.',
-              showConfirmButton: false,
-              timer: 1500,
-              customClass: {
-                popup: 'custom-swal-popup'
-            }
-            })
-            document.querySelectorAll('.cancel-tag').forEach(elem => elem.classList.remove('d-none'))
-            document.getElementById('cancel-btn').style.display = 'none';
-            document.getElementById('payment-status').innerHTML = 'Failed';
-            document.getElementById('order-status').innerHTML = 'Canceled';
-            document.getElementById('total-amount').innerHTML = 0;
-            document.querySelectorAll('.item-indi-cancel').forEach(element => {
-                element.style.display = 'none'
-            })
-        }
-      } catch (error) {
-            Swal.fire({
-                position: "top-end",
-                icon: "error",
-                title: "Oops...",
-                text: error.message,
-                showConfirmButton: false,
-                timer: 1500,
-                customClass: {
-                    popup: 'custom-swal-popup'
+    const orderCancelBtn = document.getElementById('cancel-btn');
+    if(orderCancelBtn) {
+        async function orderCancellation(event) {
+            event.preventDefault();
+            try {
+                const response = await fetch(`/cancelOrder?id=<%= order._id %>`, { method: 'PATCH' });
+                const data = await response.json();
+                if(!response.ok) {
+                    throw new Error(data.message);
                 }
-            });
+                if(data.success) {
+                    Swal.fire({
+                    position: "top-end",
+                    icon: 'success',
+                    title: 'Order canceled successfully.',
+                    showConfirmButton: false,
+                    timer: 1500,
+                    customClass: {
+                        popup: 'custom-swal-popup'
+                    }
+                    })
+                    document.querySelectorAll('.cancel-tag').forEach(elem => elem.classList.remove('d-none'))
+                    document.getElementById('cancel-btn').style.display = 'none';
+                    document.getElementById('payment-status').innerHTML = 'Failed';
+                    document.getElementById('order-status').innerHTML = 'Canceled';
+                    document.getElementById('total-amount').innerHTML = 0;
+                    document.querySelectorAll('.item-indi-cancel').forEach(element => {
+                        element.style.display = 'none'
+                    })
+                }
+            } catch (error) {
+                Swal.fire({
+                    position: "top-end",
+                    icon: "error",
+                    title: "Oops...",
+                    text: error.message,
+                    showConfirmButton: false,
+                    timer: 1500,
+                    customClass: {
+                        popup: 'custom-swal-popup'
+                    }
+                });
+            }
         }
-    }
+        orderCancelBtn.addEventListener('click', orderCancellation)
+    } 
+
     
     function covertDate() {
         const dateElem = document.getElementById('order-date')
@@ -539,10 +544,6 @@
         event.preventDefault();
         document.getElementById(`individual-item${id}`).style.display = 'none';
     }
-    // document.querySelector('.item-close').addEventListener('click', hideItem);
-
-
-
 
     // fetch for cancel individual item
     async function changeItemstatus(event, itemId, i) {
@@ -596,7 +597,6 @@
                 } else {
                     document.getElementById('canceledItem'+i).value = data.itemQty;
                     let qtyInp = document.getElementById('qty-input'+i);
-                    console.log(qtyInp.value, data.remainQty)
                     if(qtyInp.value>data.remainQty) {
                         qtyInp.value = data.remainQty;
                     }
@@ -628,7 +628,6 @@
 
     function incQuantity(event, i) {
         event.preventDefault();
-        console.log('qty increase')
         const quantity = document.getElementById('item-qty'+i).innerHTML;
         const canQty = document.getElementById('canceledItem'+i).value
         const qtyValue = document.getElementById('qty-input'+i).value;
@@ -638,29 +637,27 @@
     }
     function decQuantity(event, i) {
         event.preventDefault();
-        console.log('qty descrrese')
         const qtyValue = document.getElementById('qty-input'+i).value;
         if(qtyValue > 1) {
             document.getElementById('qty-input'+i).value--;
         }
     }
-        function clearModal() {
-            document.getElementById('item-name').innerHTML = '';
-            document.getElementById('item-color').innerHTML = '';
-            document.getElementById('item-size').innerHTML = '';
-            document.getElementById('item-price').innerHTML = '';
-            // document.getElementById('item-status').innerHTML = '';
-            // document.getElementById('item-qty1').innerHTML = '';
-            // document.getElementById('qty-input').value = '';
-        } 
 
-    document.getElementById('return-btn').addEventListener('click', () => {
-        document.getElementById('return-modal').style.display = 'block';
-    });
+   
+    const returnBtn = document.getElementById('return-btn');
+    if(returnBtn) {
+        returnBtn.addEventListener('click', () => {
+            document.getElementById('return-modal').style.display = 'block';
+        });
+    }
+  
+    const returnCancelBtn = document.getElementById('return-cancel-btn');
+    if(returnCancelBtn) {
+        returnCancelBtn.addEventListener('click', () => {
+            document.getElementById('return-modal').style.display = 'none';
+        });
+    }
 
-     document.getElementById('return-cancel-btn').addEventListener('click', () => {
-        document.getElementById('return-modal').style.display = 'none';
-    });
     function openReturnModal(event, i, itemId) {
         document.getElementById('individual-item'+i).style.display = 'none';
         document.getElementById('return-indi-modal').style.display = 'block';
@@ -680,132 +677,136 @@
         document.getElementById('return-indi-modal').style.display = 'none';
     });
 
-    // all product return function
-    
-    async function returnOrder(value) {
-        try {
-            let reason = [];
-            const reasons = document.getElementsByName('reason');
-            reasons.forEach(ele => {
-                if(ele.checked) {
-                    reason.push(ele.value);
+    const returnOrderBtn = document.getElementById('return-order-btn');
+    if(returnOrderBtn) {
+        // all product return function
+        async function returnOrder() {
+            try {
+                let reason = [];
+                const reasons = document.getElementsByName('reason');
+                reasons.forEach(ele => {
+                    if(ele.checked) {
+                        reason.push(ele.value);
+                    }
+                });
+                if(reason.length===0) {
+                    Swal.fire({
+                        position: "top-end",
+                        icon: "error",
+                        title: "Oops...",
+                        text: 'Select your reason for returning',
+                        showConfirmButton: false,
+                        timer: 1500,
+                        customClass: {
+                            popup: 'custom-swal-popup'
+                        }
+                    });
+                    return;
                 }
-            });
-            if(reason.length===0) {
+
+                const response = await fetch(`/returnOrder?id=<%= order._id %>`, {
+                    method:'POST',
+                    headers: {
+                        'content-type': 'application/json'
+                    },
+                    body: JSON.stringify({reason})
+                });
+                const data = await response.json();
+                if(!response.ok) {
+                    throw new Error(data.message);
+                }
+                if(data.success) {
+                    Swal.fire({
+                        position: "top-end",
+                        icon: 'success',
+                        title: 'Order return requested.',
+                        showConfirmButton: false,
+                        timer: 1500,
+                        customClass: {
+                            popup: 'custom-swal-popup'
+                        }
+                    });
+                    document.getElementById('return-modal').style.display = 'none';
+                    document.getElementById('confirm-cont').classList.remove('d-none');
+                    document.getElementById('confirm-cont').classList.add('d-flex');
+                    document.getElementById('return-btn').classList.add('d-none');
+                    document.querySelectorAll('.confirm-indi-cont').forEach(element => {
+                        element.classList.remove('d-flex');
+                        element.classList.add('d-none');
+                    });
+                    document.querySelectorAll('.indi-all-return').forEach(element => element.classList.remove('d-none'));
+                    document.querySelectorAll('.indi-return-text').forEach(element => element.classList.add('d-none'));
+                    document.querySelectorAll('.cancel-indi-return').forEach(element => element.classList.add('d-none'));
+                    document.querySelectorAll('.item-return-cont').forEach(element => element.classList.remove('d-none'));
+                } 
+            } catch (error) {
                 Swal.fire({
                     position: "top-end",
                     icon: "error",
                     title: "Oops...",
-                    text: 'Select your reason for returning',
+                    text: error.message,
                     showConfirmButton: false,
                     timer: 1500,
                     customClass: {
                         popup: 'custom-swal-popup'
                     }
                 });
-                return;
             }
-
-            const response = await fetch(`/returnOrder?id=<%= order._id %>&allProduct=${value}`, {
-                method:'POST',
-                headers: {
-                    'content-type': 'application/json'
-                },
-                body: JSON.stringify({reason})
-            });
-            const data = await response.json();
-            if(!response.ok) {
-                throw new Error(data.message);
-            }
-            if(data.success) {
-                Swal.fire({
-                    position: "top-end",
-                    icon: 'success',
-                    title: 'Order return requested.',
-                    showConfirmButton: false,
-                    timer: 1500,
-                    customClass: {
-                        popup: 'custom-swal-popup'
-                    }
-                });
-                document.getElementById('return-modal').style.display = 'none';
-                document.getElementById('confirm-cont').classList.remove('d-none');
-                document.getElementById('confirm-cont').classList.add('d-flex');
-                document.getElementById('return-btn').classList.add('d-none');
-                document.querySelectorAll('.confirm-indi-cont').forEach(element => {
-                    element.classList.remove('d-flex');
-                    element.classList.add('d-none');
-                });
-                document.querySelectorAll('.indi-all-return').forEach(element => element.classList.remove('d-none'));
-                document.querySelectorAll('.indi-return-text').forEach(element => element.classList.add('d-none'));
-                document.querySelectorAll('.cancel-indi-return').forEach(element => element.classList.add('d-none'));
-                document.querySelectorAll('.item-return-cont').forEach(element => element.classList.remove('d-none'));
-            } 
-        } catch (error) {
-            Swal.fire({
-                position: "top-end",
-                icon: "error",
-                title: "Oops...",
-                text: error.message,
-                showConfirmButton: false,
-                timer: 1500,
-                customClass: {
-                    popup: 'custom-swal-popup'
-                }
-            });
         }
+        returnOrderBtn.addEventListener('click', returnOrder);
     }
 
     // all return cancel function
+    const cancelReturnBtn = document.getElementById('cancel-return-btn');
+    if(cancelReturnBtn) {
+        async function returnCancel(event) {
+            try {
+                event.preventDefault()
+                const response = await fetch(`/cancelReturn?id=<%= order._id %>`, {method:'PATCH'});
+                const data = await response.json();
+                if(!response.ok) {
+                    throw new Error(data.message);
+                }
+                if(data.success) {
+                    Swal.fire({
+                        position: "top-end",
+                        icon: 'success',
+                        title: 'order return request canceled.',
+                        showConfirmButton: false,
+                        timer: 1500,
+                        customClass: {
+                            popup: 'custom-swal-popup'
+                        }
+                    });
+                    document.getElementById('confirm-cont').classList.remove('d-flex');
+                    document.getElementById('confirm-cont').classList.add('d-none');
+                    document.getElementById('return-btn').classList.remove('d-none');
+                    document.querySelectorAll('.confirm-indi-cont').forEach(element => {
+                        element.classList.remove('d-none');
+                        element.classList.add('d-flex');
+                    });
+                    document.querySelectorAll('.indi-all-return').forEach(element => element.classList.add('d-none'));
 
-    async function returnCancel(event) {
-        try {
-            event.preventDefault()
-            const response = await fetch(`/cancelReturn?id=<%= order._id %>`, {method:'PATCH'});
-            const data = await response.json();
-            if(!response.ok) {
-                throw new Error(data.message);
-            }
-            if(data.success) {
+                } 
+            } catch (error) {
                 Swal.fire({
                     position: "top-end",
-                    icon: 'success',
-                    title: 'order return request canceled.',
+                    icon: "error",
+                    title: "Oops...",
+                    text: error.message,
                     showConfirmButton: false,
                     timer: 1500,
                     customClass: {
                         popup: 'custom-swal-popup'
                     }
                 });
-                document.getElementById('confirm-cont').classList.remove('d-flex');
-                document.getElementById('confirm-cont').classList.add('d-none');
-                document.getElementById('return-btn').classList.remove('d-none');
-                document.querySelectorAll('.confirm-indi-cont').forEach(element => {
-                    element.classList.remove('d-none');
-                    element.classList.add('d-flex');
-                });
-                document.querySelectorAll('.indi-all-return').forEach(element => element.classList.add('d-none'));
-
-            } 
-        } catch (error) {
-            Swal.fire({
-                position: "top-end",
-                icon: "error",
-                title: "Oops...",
-                text: error.message,
-                showConfirmButton: false,
-                timer: 1500,
-                customClass: {
-                    popup: 'custom-swal-popup'
-                }
-            });
+            }
+    
         }
-   
+        cancelReturnBtn.addEventListener('click', returnCancel);
     }
-    document.getElementById('cancel-return-btn').addEventListener('click', returnCancel);
-  
+   
     // individual return function
-
     async function returnConfirmIndi(event, itemId, quantity, i) { 
         try {
             event.preventDefault()
@@ -876,7 +877,6 @@
     }
 
     // individuat cancel return function
-
     async function cancelIndiReturn(event, i, itemId) {
         try {
             event.preventDefault()
@@ -915,6 +915,7 @@
         }
     }
 
+
     async function invoicePDFDoc(event, id) {
         event.preventDefault();
         try {
@@ -951,76 +952,51 @@
         }
     }
 
-    async function continueRazorpay(event) {
-        event.preventDefault()
-        try {
-            const response = await fetch('/continue-razorpay?orderId=<%= order._id %>', {method: 'POST'});
-            const data = await response.json();
-            if(!response.ok) {
-                throw new Error(data.message);
-            }
-            if(data.success) {
-                console.log('dkjfdkjfdkjfkd')
-                const options = {
-                    key: data.razorpayId,
-                    amount: data.amount,
-                    currency: data.currency,
-                    name: 'GYM CLUB',
-                    description: 'Test Transaction',
-                    order_id: data.razorpayOrderId,
-                    theme: {
-                        color: '#F37254'
-                    },
-                    handler: async function (response) {
-                        try {
-                            const res = await fetch(`/verifyPayment?orderId=${data.orderId}`, {
-                                method: 'POST',
-                                headers: {
-                                'Content-Type': 'application/json',
-                                'x-razorpay-signature': response.razorpay_signature
-                                },
-                                body: JSON.stringify({
-                                razorpay_order_id: response.razorpay_order_id,
-                                razorpay_payment_id: response.razorpay_payment_id
-                                })
-                            });
-                            const verifydata = await res.json();
-                            if(!res.ok) {
-                                if(verifydata.redirectUrl) {
-                                    window.location.href = verifydata.redirectUrl;
-                                }
-                                throw new Error(verifydata.message);
-                            }
-                            if(verifydata.success) {
-                                event.target.style.display = 'none';
-                                document.getElementById('payment-status').innerHTML = 'Paid';
-                            }
-                        } catch (error) {
-                            Swal.fire({
-                                position: "top-end",
-                                icon: "error",
-                                title: "Oops...",
-                                text: error.message,
-                                showConfirmButton: false,
-                                timer: 1500,
-                                customClass: {
-                                    popup: 'custom-swal-popup'
-                                }
-                            });
-                        }
-                    },
-                    modal: {
-                        ondismiss: async () => {
+    const razorpayPayBtn = document.getElementById('razorpay-pay-btn');
+    if(razorpayPayBtn) {
+        async function continueRazorpay(event) {
+            event.preventDefault()
+            try {
+                const response = await fetch('/continue-razorpay?orderId=<%= order._id %>', {method: 'POST'});
+                const data = await response.json();
+                if(!response.ok) {
+                    throw new Error(data.message);
+                }
+                if(data.success) {
+                    const options = {
+                        key: data.razorpayId,
+                        amount: data.amount,
+                        currency: data.currency,
+                        name: 'GYM CLUB',
+                        description: 'Test Transaction',
+                        order_id: data.razorpayOrderId,
+                        theme: {
+                            color: '#F37254'
+                        },
+                        handler: async function (response) {
                             try {
-                                const res = await fetch(`/paymentStatus?orderId=${data.orderId}`);
-                                const PayStatus = await res.json();
+                                const res = await fetch(`/verifyPayment?orderId=${data.orderId}`, {
+                                    method: 'POST',
+                                    headers: {
+                                    'Content-Type': 'application/json',
+                                    'x-razorpay-signature': response.razorpay_signature
+                                    },
+                                    body: JSON.stringify({
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_payment_id: response.razorpay_payment_id
+                                    })
+                                });
+                                const verifydata = await res.json();
                                 if(!res.ok) {
-                                    throw new Error(PayStatus.message || 'Payment status fetch error');
+                                    if(verifydata.redirectUrl) {
+                                        window.location.href = verifydata.redirectUrl;
+                                    }
+                                    throw new Error(verifydata.message);
                                 }
-                                if(PayStatus.success) {
-                                    // alert('success')
-                                    document.getElementById('payment-status').innerHTML = PayStatus.paymentStatus;
-                                }   
+                                if(verifydata.success) {
+                                    event.target.style.display = 'none';
+                                    document.getElementById('payment-status').innerHTML = 'Paid';
+                                }
                             } catch (error) {
                                 Swal.fire({
                                     position: "top-end",
@@ -1034,27 +1010,56 @@
                                     }
                                 });
                             }
-                        } 
+                        },
+                        modal: {
+                            ondismiss: async () => {
+                                try {
+                                    const res = await fetch(`/paymentStatus?orderId=${data.orderId}`);
+                                    const PayStatus = await res.json();
+                                    if(!res.ok) {
+                                        throw new Error(PayStatus.message || 'Payment status fetch error');
+                                    }
+                                    if(PayStatus.success) {
+                                        // alert('success')
+                                        document.getElementById('payment-status').innerHTML = PayStatus.paymentStatus;
+                                    }   
+                                } catch (error) {
+                                    Swal.fire({
+                                        position: "top-end",
+                                        icon: "error",
+                                        title: "Oops...",
+                                        text: error.message,
+                                        showConfirmButton: false,
+                                        timer: 1500,
+                                        customClass: {
+                                            popup: 'custom-swal-popup'
+                                        }
+                                    });
+                                }
+                            } 
+                        }
                     }
+                    const rzp = new Razorpay(options);
+                    rzp.open();
                 }
-                const rzp = new Razorpay(options);
-                rzp.open();
+            
+            } catch (error) {
+                Swal.fire({
+                    position: "top-end",
+                    icon: "error",
+                    title: "Oops...",
+                    text: error.message,
+                    showConfirmButton: false,
+                    timer: 1500,
+                    customClass: {
+                        popup: 'custom-swal-popup'
+                    }
+                });
             }
-           
-        } catch (error) {
-            Swal.fire({
-                position: "top-end",
-                icon: "error",
-                title: "Oops...",
-                text: error.message,
-                showConfirmButton: false,
-                timer: 1500,
-                customClass: {
-                    popup: 'custom-swal-popup'
-                }
-            });
         }
+        razorpayPayBtn.addEventListener('click', continueRazorpay);
     }
+    
 
   </script>
 </body>

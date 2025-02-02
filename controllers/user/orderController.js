@@ -1069,7 +1069,6 @@ const getWallet = async (req, res) => {
 const returnOrders = async (req, res) => {
   try {
     const orderId = req.query.id;
-    const value = req.query.allProduct;
     const reasons = req.body.reason;
     const order = await Order.findOne({_id: orderId, orderStatus: 'Delivered'});
     if(!order) {
