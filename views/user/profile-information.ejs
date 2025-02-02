@@ -178,7 +178,6 @@
                     <div class="account__wrapper">
                         <div class="account__content">
                             <h3 class="account__content--title mb-20">Profile Information</h3>
-                            <!-- <button class="new__address--btn primary__btn mb-25" type="button">Add a new address</button> -->
                             <div class="account__details two">
                                 <h4 class="account__details--title">Name</h4>
                                 <p class="account__details--desc" id="name-div"><%= userData.name %></p>
@@ -227,18 +226,6 @@
                                     <div class="text-danger error-message" id="name-error"></div>
                                 </div>
                             </form>
-                            <!-- <form onsubmit="return submitEditEmail(event)">
-                                <div class="row">
-                                      <label for="email">Email Address</label>
-                                    <div class="col-9">
-                                        <input class="account__login--input" oninput="return disableEditBtn()" placeholder="Email Address" id="email" type="email" value="">
-                                    </div>
-                                    <div class="col-3">
-                                        <button class="account__login--btn primary__btn edit-save" type="submit" id="editEmail-save">Save</button>
-                                    </div>
-                                    <div class="text-danger error-message" id="email-error"></div>
-                                </div>
-                            </form> -->
                         </div>
                     </div>
                 </div>
@@ -408,184 +395,6 @@
         }
     }
 
-    //for email edit otp
-    // function submitEditEmail(event) {
-    //     event.preventDefault();
-    //     if(!editEmailValidation()) {
-    //         return;
-    //     }
-    //     const emailElem = document.getElementById('email')
-    //     const emailInput = emailElem.value;
-    //     const otpModal = document.getElementById('otp-modal');
-    //     fetch('/editEmailOtp?id=', {
-    //         method: 'POST',
-    //         headers: {
-    //             'content-type': 'application/json'
-    //         },
-    //         body: JSON.stringify({email:emailInput})
-    //     })
-    //     .then((response) => {
-    //         if(!response.ok) {
-    //             throw new Error(`HTTP error! status code: ${response.status}`);
-    //         }
-    //         return response.json();
-    //     })
-    //     .then((data) => {
-    //         if(data.success) {
-    //             Swal.fire({
-    //           position: "top-end",
-    //           icon: 'success',
-    //           title: 'OTP send Successfully',
-    //           showConfirmButton: false,
-    //           timer: 1500,
-    //           customClass: {
-    //             popup: 'custom-swal-popup'
-    //         }
-    //         })
-    //         .then(() => {
-    //           otpModal.style.display = 'block';
-    //           startTimer();
-    //         })
-    //         } else {
-    //             Swal.fire({
-    //                 position: "top-end",
-    //                 icon: "error",
-    //                 title: "Oops...",
-    //                 text: data.message,
-    //                 showConfirmButton: false,
-    //                 timer: 1500,
-    //                 customClass: {
-    //                     popup: 'custom-swal-popup'
-    //                 }
-    //             });
-    //         }
-    //     })
-    //     .catch((error) => {
-    //         alert(error)
-    //     })
-
-    // }
-
-    //for otp varification
-    // function validateOTPForm(event) {
-    //   event.preventDefault();
-    //   const otpInput = document.getElementById('otp').value;
-  
-    //   fetch('/emailOtp', {
-    //     method: 'POST',
-    //     headers: {
-    //       'content-type': 'application/json'
-    //     },
-    //     body: JSON.stringify({otpInput})
-    //   })
-    //   .then((response) => {
-    //     if(!response.ok) {
-    //       throw new Error(`HTTP error! status code: ${response.status}`);
-    //     }
-    //     return response.json();
-    //   })
-    //   .then((data) => {
-    //     if(data.success) {
-    //       Swal.fire({
-    //           position: "top-end",
-    //           icon: 'success',
-    //           title: 'Email changed Successfully',
-    //           showConfirmButton: false,
-    //           timer: 1500,
-    //           customClass: {
-    //             popup: 'custom-swal-popup'
-    //         }
-    //         })
-    //         .then(() => {
-    //           window.location.href = data.redirectUrl;
-    //         })
-       
-    //     } else {
-    //       Swal.fire({
-    //         position: "top-end",
-    //         icon: "error",
-    //         title: "Oops...",
-    //         text: data.message,
-    //         showConfirmButton: false,
-    //         timer: 1500,
-    //         customClass: {
-    //             popup: 'custom-swal-popup'
-    //         }
-    //       });
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     Swal.fire({
-    //         position: "top-end",
-    //         icon: "error",
-    //         title: "Oops...",
-    //         text:"Invalid OTP",
-    //         showConfirmButton: false,
-    //         timer: 1500,
-    //         customClass: {
-    //             popup: 'custom-swal-popup'
-    //         }
-    //       });
-    //   })
-    // }
-
-    //for resend otp
-    // function resendOTP() {
-    //   clearInterval(timerInterval);
-    //   timer = 30;
-    //   resendBtn.classList.add('resend-disabled');
-    //   resendBtn.disabled = true;
-    //   timerElement.innerHTML = "";
-    //   startTimer();
-    //   fetch('/emailResentOtp', {
-    //     method: 'POST',
-    //   })
-    //   .then((response) => {
-    //     if(!response.ok) {
-    //       throw new Error(`HTTP error! status code: ${response.status}`);
-    //     }
-    //     return response.json();
-    //   })
-    //   .then((data) => {
-    //     if(data.success) {
-    //       Swal.fire({
-    //           position: "top-end",
-    //           icon: 'success',
-    //           title: 'OTP resend Successfully',
-    //           showConfirmButton: false,
-    //           timer: 1500,
-    //           customClass: {
-    //             popup: 'custom-swal-popup'
-    //         }
-    //         })
-    //     } else {
-    //       Swal.fire({
-    //         position: "top-end",
-    //         icon: "error",
-    //         title: "Oops...",
-    //         text: data.message,
-    //         showConfirmButton: false,
-    //         timer: 1500,
-    //         customClass: {
-    //             popup: 'custom-swal-popup'
-    //         }
-    //       });
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     Swal.fire({
-    //         position: "top-end",
-    //         icon: "error",
-    //         title: "Oops...",
-    //         text:error.message,
-    //         showConfirmButton: false,
-    //         timer: 1500,
-    //         customClass: {
-    //             popup: 'custom-swal-popup'
-    //         }
-    //       });
-    //   })
-    // }
     //for edit name
     async function editName(event) {
         event.preventDefault();
@@ -707,21 +516,7 @@
 
         return isValid
     }
-    // for disable edit save button
-    // function disableEditBtn() {
-    //     const currentEmail = document.getElementById('email-div').innerHTML;
-        
-    //     const email = document.getElementById('email').value;
-    //     const saveButton = document.getElementById('editEmail-save');
-
-    //     saveButton.classList.add('edit-save');
-    //     saveButton.disabled = true;
-
-    //     if(email !== currentEmail) {
-    //         saveButton.classList.remove('edit-save');
-    //         saveButton.disabled = false;
-    //     }   
-    // }
+  
     // for disable name save button
     function disableNameBtn() {
         const currentName = document.getElementById('name-div').innerHTML;    
@@ -737,26 +532,6 @@
             saveButton.disabled = false;
         }   
     }
-
-    // function editEmailValidation() {
-    //     let isValid = true;
-
-    //     const email = document.getElementById('email').value;
-    //     const emailError = document.getElementById('email-error');
-
-    //     emailError.textContent = '';
-    //     emailError.style.display = 'none';
-
-    //     const emailReg = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-          
-
-    //     if(!emailReg.test(email)) {
-    //         isValid = false;
-    //         emailError.textContent = 'Please enter a valid email, includes @ .com';
-    //         emailError.style.display = 'block';
-    //     }
-    //     return isValid;
-    // }
 
     function validateName() {
         let isValid = true;
@@ -778,7 +553,6 @@
         } 
         return isValid;
     }
-
 
     // script for modal controll
     const editModal = document.getElementById('edit-modal');
