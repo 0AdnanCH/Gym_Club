@@ -1059,7 +1059,7 @@ const getWallet = async (req, res) => {
     } else {
       const wallet = new Wallet({userId})
       await wallet.save();
-      return res.render('wallet', {balance: wallet.balance});
+      return res.render('wallet', {balance: wallet.balance, transactions: null});
     }
   } catch (error) {
     res.redirect('/pageNotFound');
