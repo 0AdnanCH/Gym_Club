@@ -1090,55 +1090,6 @@
             }
         }
 
-        //document.getElementById('shipping-btn').addEventListener('click', submitCheckout)
-
-        // for payment details
-        // function submitCheckout(event) {
-        //     event.preventDefault();
-        //     const addressCheck = document.getElementsByName('address-check');
-        //     let addressId;
-        //     for(let i=0; i<addressCheck.length; i++) {
-        //         if(addressCheck[i].checked) {
-        //             addressId = addressCheck[i].value;
-        //             break; 
-        //         }
-        //     }
-        //     if(!addressId) {
-        //         Swal.fire({
-        //             position: "top-end",
-        //             icon: "error",
-        //             title: "Oops...",
-        //             text: 'Please give Shipping address.',
-        //             showConfirmButton: false,
-        //             timer: 1500,
-        //             customClass: {
-        //                 popup: 'custom-swal-popup'
-        //             }
-        //         });
-        //         return;
-        //     }
-        //     fetch(`/checkout?id=${addressId}`,{
-        //         method: 'POST'
-        //     })
-        //     .then((response) => {
-        //         if (!response.ok) {
-        //                 throw new Error(`HTTP error! status code: ${response.status}`);
-        //             }
-        //             return response.json();
-        //     })
-        //     .then((data) => {
-        //         if(data.success) {
-        //             window.location.href = data.redirectUrl;
-        //         } else {
-        //             window.location.href = data.redirectUrl;
-        //         }
-        //     })
-        //     .catch((error) => {
-        //         console.log(error);
-        //     })
-
-        // }
-         // for coupon apply 
     async function applyCoupon(event) {
         event.preventDefault();
         try {
