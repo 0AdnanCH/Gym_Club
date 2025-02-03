@@ -9,21 +9,21 @@
     <title>Suruchi - Checkout</title>
     <meta name="description" content="Morden Bootstrap HTML5 Template">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
 
     <!-- ======= All CSS Plugins here ======== -->
-    <link rel="stylesheet" href="assets/css/plugins/swiper-bundle.min.css">
-    <link rel="stylesheet" href="assets/css/plugins/glightbox.min.css">
+    <link rel="stylesheet" href="css/plugins/swiper-bundle.min.css">
+    <link rel="stylesheet" href="css/plugins/glightbox.min.css">
     <link
         href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
         rel="stylesheet">
     
     <!-- Plugin css -->
-    <link rel="stylesheet" href="assets/css/vendor/bootstrap.min.css">
+    <link rel="stylesheet" href="css/vendor/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Custom Style CSS -->
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="css/style.css">
     <style>
         .add-address-cont,
         .edit-address-cont {
@@ -69,7 +69,7 @@
                 <div class="main checkout__mian">
                     <header class="main__header checkout__mian--header mb-30">
                         <h1 class="main__logo--title"><a class="logo logo__left mb-20" href="/"><img
-                                    src="assets/img/logo/nav-log.png" alt="logo"></a></h1>
+                                    src="img/logo/nav-log.png" alt="logo"></a></h1>
                         <details class="order__summary--mobile__version">
                             <summary class="order__summary--toggle border-radius-5">
                                 <span class="order__summary--toggle__inner">
@@ -101,7 +101,7 @@
                                                     <div class="product__image two  d-flex align-items-center">
                                                         <div class="product__thumbnail border-radius-5">
                                                             <a href="#"><img class="border-radius-5"
-                                                                    src="assets/img/product/small-product7.png"
+                                                                    src="img/product/small-product7.png"
                                                                     alt="cart-product"></a>
                                                             <span class="product__thumbnail--quantity">1</span>
                                                         </div>
@@ -123,7 +123,7 @@
                                                     <div class="cart__product d-flex align-items-center">
                                                         <div class="product__thumbnail border-radius-5">
                                                             <a href="#"><img class="border-radius-5"
-                                                                    src="assets/img/product/small-product2.png"
+                                                                    src="img/product/small-product2.png"
                                                                     alt="cart-product"></a>
                                                             <span class="product__thumbnail--quantity">1</span>
                                                         </div>
@@ -145,7 +145,7 @@
                                                     <div class="cart__product d-flex align-items-center">
                                                         <div class="product__thumbnail border-radius-5">
                                                             <a href="#"><img class="border-radius-5"
-                                                                    src="assets/img/product/small-product4.png"
+                                                                    src="img/product/small-product4.png"
                                                                     alt="cart-product"></a>
                                                             <span class="product__thumbnail--quantity">1</span>
                                                         </div>
@@ -219,29 +219,6 @@
                         </nav>
                     </header>
                     <main class="main__content_wrapper">
-                        <!-- <form action="#"> -->
-                        <!-- <div class="checkout__content--step section__contact--information">
-                                <div class="section__header checkout__section--header d-flex align-items-center justify-content-between mb-25">
-                                    <h2 class="section__header--title h3">Contact information</h2>
-                                    <p class="layout__flex--item">
-                                        Already have an account?
-                                        <a class="layout__flex--item__link" href="login.html">Log in</a>  
-                                    </p>
-                                </div>
-                                <div class="customer__information">
-                                    <div class="checkout__email--phone mb-12">
-                                       <label>
-                                            <input class="checkout__input--field border-radius-5" placeholder="Email or mobile phone mumber"  type="text">
-                                       </label>
-                                    </div>
-                                    <div class="checkout__checkbox">
-                                        <input class="checkout__checkbox--input" id="check1" type="checkbox">
-                                        <span class="checkout__checkbox--checkmark"></span>
-                                        <label class="checkout__checkbox--label" for="check1">
-                                            Email me with news and offers</label>
-                                    </div>
-                                </div>
-                            </div> -->
                         <div class="checkout__content--step section__shipping--address">
                             <div class="section__header mb-25">
                                 <h3 class="section__header--title" id="shipping-address">Shipping address</h3>
@@ -254,7 +231,6 @@
                                 <% } else { %>
                                     <h4>No Addressess found in your account</h4>
                                     <p>add a delivery address.</p>
-                                    <!-- <button class="new__address--btn primary__btn mb-25" id="add-open-btn" type="button">Add a new address</button> -->
                                     <% } %>
 
                                         <!-- for add a new address -->
@@ -851,13 +827,13 @@
     <!-- razorpay script -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>    
     <!-- All Script JS Plugins here  -->
-    <script src="assets/js/vendor/popper.js" defer="defer"></script>
-    <script src="assets/js/vendor/bootstrap.min.js" defer="defer"></script>
-    <script src="assets/js/plugins/swiper-bundle.min.js"></script>
-    <script src="assets/js/plugins/glightbox.min.js"></script>
+    <script src="js/vendor/popper.js" defer="defer"></script>
+    <script src="js/vendor/bootstrap.min.js" defer="defer"></script>
+    <script src="js/plugins/swiper-bundle.min.js"></script>
+    <script src="js/plugins/glightbox.min.js"></script>
 
     <!-- Customscript js -->
-    <script src="assets/js/script.js"></script>
+    <script src="js/script.js"></script>
 
     <script>
         let noOfAddress = Number('<%= userAddress.length %>');
