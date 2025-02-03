@@ -16,18 +16,10 @@ connectDB();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.set("trust proxy", 1);
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true,
-  proxy: true,
-  cookie: {
-    secure: process.env.NODE_ENV === "production",
-    httpOnly: true,
-    sameSite: "none", 
-    maxAge: 72*60*60*1000
-  }
 }));
 
 app.use(nocache())
