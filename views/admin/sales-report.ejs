@@ -186,7 +186,7 @@
                                          </thead>
                                          <!-- end thead-->
                                          <tbody id="report-tBody">
-                                          <% if(result) { %>
+                                          <% if(result && result.length > 0) { %>
                                           <% for(let i = 0; i<result.length; i++) { %>
                                               <tr>
                                                    <td class="ps-3"><%= result[i].date %></td>

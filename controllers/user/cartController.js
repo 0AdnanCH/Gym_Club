@@ -16,22 +16,12 @@ const getCart = async(req, res) => {
       return res.redirect('/login');
     }
     const cart = await Cart.findOne({userId});
-    const products = await Product.find({isBlocked: false}).sort({createdAt: -1});
-    const product = products.splice(0, 5);
-    const category = await Category.find({isListed:true})
-    .populate('offerApplied')
-    .exec();
-    for (const item of product) {
-      const cate = category.find(cat => cat._id.equals(item.category));
-      if(item.offerApplied || cate.offerApplied) { 
-        item.offerApplied = await allProductOffer(item.offerApplied, cate.offerApplied, item.salePrice);
-      }
-    }
-    if(!cart) {
-      return res.render('cart', { cart: null, product}); 
-    }
     let oldAmount = 0;
     const offer = await Offer.find()
+    const products = await Product.find({isBlocked: false})
+    .sort({createdAt: -1})
+    .populate('offerApplied')
+    .exec();
     const newItems = cart.items.filter((item) => {
       const itemProduct = products.find((productItem) => productItem._id.equals(item.productId));
       if(!itemProduct) return false;
@@ -50,7 +40,7 @@ const getCart = async(req, res) => {
         }
       } 
       return item.quantity !== null;
-    })
+    });
     const subtotal = cart.subtotal - oldAmount;
     const totalAmount = cart.totalAmount - oldAmount;
     const updatedCart = await Cart.findOneAndUpdate({userId}, {$set: {items: newItems , subtotal, totalAmount}}, {new: true})
@@ -59,7 +49,21 @@ const getCart = async(req, res) => {
       select: 'productName'
     })
     .exec();
-    res.render('cart', {cart:updatedCart, product});  
+    const product = products.splice(0, 5);
+    const category = await Category.find({isListed:true})
+    .populate('offerApplied')
+    .exec();
+    for (const item of product) {
+      const cate = category.find(cat => cat._id.equals(item.category));
+      if(item.offerApplied || cate.offerApplied) { 
+        item.offerApplied = await allProductOffer(item.offerApplied, cate.offerApplied, item.salePrice);
+      }
+    }
+    if(cart && Array.isArray(updatedCart.items) && updatedCart.items.length > 0) {
+      res.render('cart', {cart: updatedCart, product});
+    } else {
+      res.render('cart', {cart: null, product});
+    }
   } catch (error) {
     console.error('Get Cart Error' ,error);
     res.redirect('/pageNotFound');

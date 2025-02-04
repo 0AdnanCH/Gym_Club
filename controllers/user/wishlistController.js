@@ -14,7 +14,9 @@ const getWishlist = async (req, res) => {
     const wishlist = await Wishlist.findOne({userId});
     const offer = await Offer.find()
     const products = await Product.find({isBlocked: false})
-    .sort({createdAt: -1});
+    .sort({createdAt: -1})
+    .populate('offerApplied')
+    .exec();
     let newItem;
     if(wishlist && Array.isArray(wishlist.items) && wishlist.items.length > 0) {
     newItem = wishlist.items.map((item) => {

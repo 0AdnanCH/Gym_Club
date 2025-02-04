@@ -397,7 +397,7 @@ async function salesreportOfDay(date) {
   ]);
 }
 
-const salesReport = async (req, res, next) => {
+const salesReport = async (req, res) => {
   try {
     const IST_OFFSET = 5.5 * 60 * 60 * 1000; 
     const order = await Order.findOne().sort({createdAt: 1}).select('createdAt');
@@ -405,6 +405,9 @@ const salesReport = async (req, res, next) => {
     let endDate = new Date()
     endDate = new Date(endDate.getTime() + IST_OFFSET).toISOString().split('T')[0];
     const result = await salesreportOfMonth(startDate, endDate);
+    if(!result || result.length === 0) {
+      return res.render('sales-report', {result: null, total: null, heading: 'SALES REPORT'});
+    }
     let total;
     if(result.length>0) {
       total = {
