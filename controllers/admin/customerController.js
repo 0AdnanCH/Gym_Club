@@ -9,6 +9,7 @@ const customerInfo = async (req, res) => {
     }
     const limit = 5;
     const userData = await User.find({isAdmin:false})
+    .sort({createdAt: -1})
     .limit(limit * 1)
     .skip((page - 1) * limit)
     .exec();
