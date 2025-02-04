@@ -117,7 +117,6 @@
         resendBtn.classList.add('resend-disabled');
         resendBtn.disabled = true;
         timerElement.innerHTML = "";
-        startTimer();
         const response = await fetch('/resend-otp', {method:'POST'});
         const data = await response.json();
         if(!response.ok) {
@@ -127,6 +126,7 @@
           throw new Error(data.message);
         }
         if(data.success) {
+          startTimer();
           Swal.fire({
             icon: 'success',
             title: 'OTP Resend Successfully',
