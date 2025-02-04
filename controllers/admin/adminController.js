@@ -78,10 +78,11 @@ const yearChart = async (req, res) => {
   }
 }
 
-const monthChart = async (req, res, next) => {
+const monthChart = async (req, res) => {
   try {
     const selectedMonth = req.query.selectedMonth; 
     const selectedYear = req.query.selectedYear;
+    console.log(selectedMonth, selectedYear)
 
     const dailyOrderCounts = await Order.aggregate([
       {
