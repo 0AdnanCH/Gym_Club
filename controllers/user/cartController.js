@@ -22,33 +22,43 @@ const getCart = async(req, res) => {
     .sort({createdAt: -1})
     .populate('offerApplied')
     .exec();
-    const newItems = cart.items.filter((item) => {
-      const itemProduct = products.find((productItem) => productItem._id.equals(item.productId));
-      if(!itemProduct) return false;
-      const variant = itemProduct.variant.find((variant) => variant.color === item.color);
-      if (variant[item.size] === 0 || variant[item.size] < item.quantity) {
-        item.quantity = null;
-        oldAmount += item.totalPrice;
-      }
-      if(itemProduct.offerApplied) {
-        const productOffer = offer.find(off => off._id.equals(itemProduct.offerApplied));
-        if(productOffer) {
-          if(productOffer.offerStatus === 'inactive' || productOffer.offerStatus === 'expired') {
-            item.price = itemProduct.salePrice;
-            item.totalPrice = itemProduct.salePrice * item.quantity;
-          }
+    let newItems;
+    let subtotal
+    let totalAmount;
+    if(cart && Array.isArray(cart.items) && cart.items.length > 0) {
+      newItems = cart.items.filter((item) => {
+        const itemProduct = products.find((productItem) => productItem._id.equals(item.productId));
+        if(!itemProduct) return false;
+        const variant = itemProduct.variant.find((variant) => variant.color === item.color);
+        if (variant[item.size] === 0 || variant[item.size] < item.quantity) {
+          item.quantity = null;
+          oldAmount += item.totalPrice;
         }
-      } 
-      return item.quantity !== null;
-    });
-    const subtotal = cart.subtotal - oldAmount;
-    const totalAmount = cart.totalAmount - oldAmount;
-    const updatedCart = await Cart.findOneAndUpdate({userId}, {$set: {items: newItems , subtotal, totalAmount}}, {new: true})
-    .populate({
-      path: 'items.productId',
-      select: 'productName'
-    })
-    .exec();
+        if(itemProduct.offerApplied) {
+          const productOffer = offer.find(off => off._id.equals(itemProduct.offerApplied));
+          if(productOffer) {
+            if(productOffer.offerStatus === 'inactive' || productOffer.offerStatus === 'expired') {
+              item.price = itemProduct.salePrice;
+              item.totalPrice = itemProduct.salePrice * item.quantity;
+            }
+          }
+        } 
+        return item.quantity !== null;
+      });
+      subtotal = cart.subtotal - oldAmount;
+      totalAmount = cart.totalAmount - oldAmount;
+    }
+    let updatedCart;
+    if(newItems) {
+      updatedCart = await Cart.findOneAndUpdate({userId}, {$set: {items: newItems , subtotal, totalAmount}}, {new: true})
+      .populate({
+        path: 'items.productId',
+        select: 'productName'
+      })
+      .exec();
+    } else {
+      updatedCart = cart;
+    }
     const product = products.splice(0, 5);
     const category = await Category.find({isListed:true})
     .populate('offerApplied')
