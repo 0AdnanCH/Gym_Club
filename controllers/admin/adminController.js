@@ -70,20 +70,22 @@ const yearChart = async (req, res) => {
   try {
     const year = req.query.year;
     const monthlyData = await getMonthlyOrderCounts(year);
-    const orderCounts = monthlyData.map(data => data.orderCount || 0); 
-    const completeOrderCounts = Array(12).fill(0).map((_, index) => orderCounts[index] || 0);
-    res.status(200).json({ success: true, orderCounts: completeOrderCounts});
+    const completeOrderCounts = Array(12).fill(0);
+    monthlyData.forEach(data => {
+      const monthIndex = data._id - 1; 
+      completeOrderCounts[monthIndex] = data.orderCount || 0;
+    });
+    res.status(200).json({ success: true, orderCounts: completeOrderCounts });
   } catch (error) {
+    console.error("Error in yearChart:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
-}
+};
 
 const monthChart = async (req, res) => {
   try {
     const selectedMonth = req.query.selectedMonth; 
     const selectedYear = req.query.selectedYear;
-    console.log(selectedMonth, selectedYear)
-
     const dailyOrderCounts = await Order.aggregate([
       {
         $addFields: {
@@ -116,7 +118,6 @@ const monthChart = async (req, res) => {
         dailyOrderCounts.find((entry) => entry._id === i + 1)?.orderCount || 0
       );
     });    
-    console.log(dailyCounts)
     res.status(200).json({ success: true, dailyCounts });
   } catch (error) {
     console.error("Error in monthChart:", error);
