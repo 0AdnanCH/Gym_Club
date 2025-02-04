@@ -19,6 +19,7 @@ const getAddProduct = async (req, res) => {
 const addProduct = async (req, res) => {
   try {
     const product = req.body;
+    console.log(product)
     const productExists = await Product.findOne({productName: new RegExp(`^${product.productName}$`, 'i')});
     if(!productExists) {
       const productColor = product.productColor
