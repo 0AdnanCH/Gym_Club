@@ -22,13 +22,10 @@ const userAuth = async (req, res, next) => {
 
 const adminAuth = async (req, res, next) => {
   try {
-    console.log('admin auth')
     const adminId = req.session.admin;
     if(adminId) {
-      console.log('admin is there')
       const admin = await User.findOne({_id: adminId, isAdmin:true});
       if(admin) {
-        console.log('admin is here')
         next();
       } else {
         res.redirect('/admin/login')
