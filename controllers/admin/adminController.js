@@ -115,7 +115,7 @@ const monthChart = async (req, res, next) => {
         dailyOrderCounts.find((entry) => entry._id === i + 1)?.orderCount || 0
       );
     });    
-
+    console.log(dailyCounts)
     res.status(200).json({ success: true, dailyCounts });
   } catch (error) {
     console.error("Error in monthChart:", error);
