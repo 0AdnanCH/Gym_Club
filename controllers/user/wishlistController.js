@@ -43,7 +43,16 @@ const getWishlist = async (req, res) => {
   } else {
      updateWishlist = wishlist;
   }
-    const product = products.slice(0, 8);
+    const product = products.slice(0, 5);
+    const category = await Category.find({isListed:true})
+    .populate('offerApplied')
+    .exec();
+    for (const item of product) {
+      const cate = category.find(cat => cat._id.equals(item.category));
+      if(item.offerApplied || cate.offerApplied) { 
+        item.offerApplied = await allProductOffer(item.offerApplied, cate.offerApplied, item.salePrice);
+      }
+    }
     if(wishlist && Array.isArray(wishlist.items) && wishlist.items.length > 0) {
          res.render('wishlist', {wishlist: updateWishlist.items, product});
     } else {
