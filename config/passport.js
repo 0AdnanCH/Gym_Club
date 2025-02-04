@@ -4,8 +4,9 @@ const User = require('../models/userSchema');
 const env = require('dotenv').config();
 
 const callbackURL = process.env.NODE_ENV === 'production' 
-  ? 'https://godomain.shop/auth/google/callback'
+  ? 'http://godomain.shop/auth/google/callback'
   : 'http://localhost:3000/auth/google/callback';
+  console.log(callbackURL)
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
