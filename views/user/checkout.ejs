@@ -743,15 +743,27 @@
                         </table>
                     </div>
                     <div class="checkout__discount--code d-flex">
-                        <label id="conpon-label">
-                            <input id="coupon-code" class="checkout__discount--code__input--field border-radius-5"
-                                placeholder="Coupon code" type="text">
-                        </label>
-                        <button id="apply-coupon-btn" class="checkout__discount--code__btn primary__btn border-radius-5"
-                            type="button">Apply</button>
-                        <h4 id="coupon-text" class="text-success">Coupon Applied</h4>
-                        <button id="remove-coupon-btn" onclick="removeCoupon(false)" class="checkout__discount--code__btn primary__btn border-radius-5"
-                        type="button">Remove Coupon</button>
+                        <% if(coupon) { %>
+                            <label id="conpon-label">
+                                <input id="coupon-code" class="display-none checkout__discount--code__input--field border-radius-5"
+                                    placeholder="Coupon code" type="text">
+                            </label>
+                            <button id="apply-coupon-btn" class="display-none checkout__discount--code__btn primary__btn border-radius-5"
+                                type="button">Apply</button>
+                            <h4 id="coupon-text" class="text-success">Coupon Applied</h4>
+                            <button id="remove-coupon-btn" onclick="removeCoupon(false)" class="checkout__discount--code__btn primary__btn border-radius-5"
+                            type="button">Remove Coupon</button>
+                        <% } else { %>
+                            <label id="conpon-label">
+                                <input id="coupon-code" class="checkout__discount--code__input--field border-radius-5"
+                                    placeholder="Coupon code" type="text">
+                            </label>
+                            <button id="apply-coupon-btn" class="checkout__discount--code__btn primary__btn border-radius-5"
+                                type="button">Apply</button>
+                            <h4 id="coupon-text" class="display-none text-success">Coupon Applied</h4>
+                            <button id="remove-coupon-btn" onclick="removeCoupon(false)" class="display-none checkout__discount--code__btn primary__btn border-radius-5"
+                            type="button">Remove Coupon</button>
+                        <% } %>
                     </div>
                     <div class="checkout__total">
                         <table class="checkout__total--table">
@@ -870,15 +882,6 @@
                 document.getElementById('edit-address-cont' + i).style.display = 'none';
                 window.location.href = '#breadcrumb'
             });
-        }
-
-        // for display coupon button
-        if('<%= coupon %>') {
-            document.getElementById('coupon-code').style.display = 'none';
-            document.getElementById('apply-coupon-btn').style.display = 'none';
-        } else {
-            document.getElementById('remove-coupon-btn').style.display = 'none';
-            document.getElementById('coupon-text').style.display = 'none';
         }
 
         // for add address
@@ -1171,10 +1174,6 @@
             })
         }
     }
-
-        // // setting apply coupon event on apply button
-        // document.getElementById('remove-coupon-btn').addEventListener('click', removeCoupon);
-        
 
     // all the payment script
 
