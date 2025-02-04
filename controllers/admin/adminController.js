@@ -290,8 +290,6 @@ async function salesreportOfMonth(startDate, endDate) {
   return await Order.aggregate([
     {
       $match: {
-        orderStatus: 'Delivered',
-        paymentStatus: 'Paid',
         createdAt: {
           $gte: new Date(new Date(`${startDate}T00:00:00.000Z`).getTime() - IST_OFFSET),
           $lte: new Date(new Date(`${endDate}T23:59:59.999Z`).getTime() - IST_OFFSET),
@@ -299,12 +297,6 @@ async function salesreportOfMonth(startDate, endDate) {
       },
     },
     { $unwind: "$items" },
-    {
-      $match: {
-        "items.isCanceled": false,
-        "items.isReturned": false,
-      },
-    },
     {
       $group: {
         _id: {
@@ -336,27 +328,11 @@ async function salesreportOfMonth(startDate, endDate) {
   ]);
 }
 
-// function convertToIST(dateString, isEndOfDay = false) {
-//   const date = new Date(dateString); 
-  
-//   if (isEndOfDay) {
-//     date.setHours(23, 59, 59, 999); 
-//   } else {
-//     date.setHours(0, 0, 0, 0); 
-//   }
-
-//   const IST_OFFSET = 5.5 * 60 * 60 * 1000; 
-//   return new Date(date.getTime() + IST_OFFSET);
-// }
-
-
 async function salesreportOfDay(date) {
   const IST_OFFSET = 5.5 * 60 * 60 * 1000;
   return result = await Order.aggregate([
     {
       $match: {
-        orderStatus: 'Delivered',
-        paymentStatus: 'Paid',
         createdAt: {
           $gte: new Date(new Date(`${date}T00:00:00.000Z`).getTime() - IST_OFFSET),
           $lte: new Date(new Date(`${date}T23:59:59.999Z`).getTime() - IST_OFFSET),
@@ -365,12 +341,6 @@ async function salesreportOfDay(date) {
     },
     {
       $unwind: '$items'
-    },
-    {
-      $match: {
-        'items.isCanceled': false,
-        'items.isReturned': false
-      }
     },
     {
       $group: {
@@ -404,7 +374,7 @@ const salesReport = async (req, res) => {
     const IST_OFFSET = 5.5 * 60 * 60 * 1000; 
     const order = await Order.findOne().sort({createdAt: 1}).select('createdAt');
     const startDate = order.createdAt.toISOString().split('T')[0];
-    let endDate = new Date()
+    let endDate = new Date();
     endDate = new Date(endDate.getTime() + IST_OFFSET).toISOString().split('T')[0];
     const result = await salesreportOfMonth(startDate, endDate);
     if(!result || result.length === 0) {
