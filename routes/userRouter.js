@@ -27,6 +27,9 @@ router.get('/auth/google/callback', passport.authenticate('google', {failureRedi
     const user = req.session.passport.user;
     const userData = await User.findOne({_id:user, isBlocked: false});
     if(userData) {
+      if(req.session.passport) {
+        req.session.user = req.session.passport.user;      
+      }
      return res.redirect('/');
     }
     req.session.destroy();

@@ -3,11 +3,13 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../models/userSchema');
 const env = require('dotenv').config();
 
-
+const callbackURL = process.env.NODE_ENV === 'production' 
+  ? 'https://godomain.shop/auth/google/callback'
+  : 'http://localhost:3000/auth/google/callback';
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: 'http://localhost:3000/auth/google/callback'
+  callbackURL: callbackURL,
 },
 async (accessToken, refreshToken, profile, done) => {
   try {
@@ -24,7 +26,7 @@ async (accessToken, refreshToken, profile, done) => {
       return done(null, user);
     }
   } catch (error) {
-    return done(err,null)
+    return done(error,null)
   }
 }));
 
