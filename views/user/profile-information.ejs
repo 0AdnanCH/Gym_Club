@@ -316,12 +316,6 @@
   <!-- All Script JS Plugins here  -->
   <script src="js/vendor/popper.js" defer="defer"></script>
   <script src="js/vendor/bootstrap.min.js" defer="defer"></script>
-  <script src="js/plugins/swiper-bundle.min.js"></script>
-  <script src="js/plugins/glightbox.min.js"></script>
-
-
-  <!-- Customscript js -->
-  <script src="js/script.js"></script>
   <script>
       let timer = 30;
   let timerInterval;
@@ -569,18 +563,20 @@
             editModal.style.display = "none";
         }
     });
-    changePassBtn.addEventListener("click", () => {
-        changePassModal.style.display = "block";
-    });
-    closebtn1.addEventListener("click", () => {
-        changePassModal.style.display = "none";
-    })
-    window.addEventListener("click", (event) => {
-        if(event.target == changePassModal) {
+    if(changePassBtn) {
+        changePassBtn.addEventListener("click", () => {
+            changePassModal.style.display = "block";
+        });
+        closebtn1.addEventListener("click", () => {
             changePassModal.style.display = "none";
-        }
-    });
-
+        })
+        window.addEventListener("click", (event) => {
+            if(event.target == changePassModal) {
+                changePassModal.style.display = "none";
+            }
+        });
+    }
+  
     const currentPassword = document.getElementById('currentPassword');
     const curpassToggButton = document.getElementById('toggle-curpassword');
     const curpassEyeIcon = document.getElementById('eye-icon1');
