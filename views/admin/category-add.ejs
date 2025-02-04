@@ -140,7 +140,19 @@
                     throw new Error(data.message);
                }
                if(data.success) {
-                    window.location.href = '/admin/category';
+                    Swal.fire({
+                         position: "top-end",
+                         icon: "success",
+                         title: 'Added successfully',
+                         showConfirmButton: false,
+                         timer: 1500,
+                         customClass: {
+                              popup: 'custom-swal-popup'
+                         }
+                    })
+                    .then(() => {
+                         window.location.href = '/admin/category'
+                    });
                }
           } catch (error) {
                Swal.fire({

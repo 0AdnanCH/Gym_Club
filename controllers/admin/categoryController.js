@@ -29,17 +29,17 @@ const addCategory = async (req, res) => {
     const {name, description} = req.body;
     const existingCategory = await Category.findOne({name: new RegExp(`^${name}$`, 'i')});
     if(existingCategory) {
-      return res.status(409).json({message: 'Category already exists'});
+      return res.status(409).json({success: false, message: 'Category already exists'});
     }
     const newCategory = new Category({
       name,
       description
     });
     await newCategory.save();
-    return res.status(200).json({message: 'Category added successfully'});
+    return res.status(200).json({ success: true});
   } catch (error) {
     console.log('Add Category Error', error);
-    return res.status(500).json({message: 'Internal Server Error'});
+    return res.status(500).json({success: false, message: 'Internal Server Error'});
   }
 }
 const loadAddCategory = async (req, res) => {
