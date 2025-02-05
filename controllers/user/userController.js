@@ -18,14 +18,11 @@ const pageNotFound = async (req, res) => {
 
 const loadHomepage = async (req, res) => {
   try {
-    if(req.session.passport) {
-      req.session.user = req.session.passport.user;      
-    }
-    const user = req.session.user; 
     const category = await Category.find({isListed:true})
     .populate('offerApplied')
     .exec();
     let product = await Product.find({
+      $expr: { $gt: [{ $size: "$variant" }, 0] },
       isBlocked:false,
       category:{$in:category.map(category => category._id)}
     })
@@ -269,11 +266,10 @@ const loadShoppingPage = async (req, res) => {
     categoryIds = categoryIds.map(val => new ObjectId(val))
     const limit = 16;
     const skip = (page-1)*limit;
-    const offer = await Offer.find({offerStatus: {$nin: ['inactive', 'expired']} })
     let product;
     if(sort === 'popularity') {
       product = await Product.aggregate([
-        { $match: { isBlocked: false, productName: {$regex: search, $options: 'i'}, category:{$in:categoryIds}}},
+        { $match: { $expr: { $gt: [{ $size: "$variant" }, 0] }, isBlocked: false, productName: {$regex: search, $options: 'i'}, category:{$in:categoryIds}}},
         { $lookup: { from: 'orders', localField: '_id', foreignField: 'items.productId', as: 'orderDetails' } },
         { $lookup: { from: 'offers', localField: 'offerApplied', foreignField: '_id', as: 'offerDetails'}},
         { $addFields: { salesCount: { $size: '$orderDetails' } } },
@@ -290,6 +286,7 @@ const loadShoppingPage = async (req, res) => {
       }
     } else {
       product = await Product.find({
+        $expr: { $gt: [{ $size: "$variant" }, 0] },
         productName: {$regex: search, $options: 'i'},
         isBlocked:false,
         category:{$in:categoryIds}

@@ -13,7 +13,7 @@ const getWishlist = async (req, res) => {
     }
     const wishlist = await Wishlist.findOne({userId});
     const offer = await Offer.find()
-    const products = await Product.find({isBlocked: false})
+    const products = await Product.find({$expr: { $gt: [{ $size: "$variant" }, 0] }, isBlocked: false})
     .sort({createdAt: -1})
     .populate('offerApplied')
     .exec();
