@@ -23,14 +23,110 @@
 
     <!-- App css (Require in all Page) -->
     <link href="css/app.min.css" rel="stylesheet" type="text/css" />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
     <!-- Theme Config js (Require in all Page) -->
     <script src="js/config.js"></script>
     <style>
-          .image-container,
-          .size-container {
-               display: none;
-          }
+     .display-none,
+     .error-message,
+     .image-container,
+     .size-container {
+          display: none;
+     }
+     .select-img {
+          background: transparent;
+          padding: 10px 15px;
+          border-radius: 10px;
+          font-weight: bold;
+          color: gray;
+          text-transform: uppercase;
+          cursor: pointer;
+          font-family: Avenir, Helvetica, Arial, sans-serif;
+          font-size: 11px;
+          transition: box-shadow ease 0.25s;
+          border: 1px solid gray;
+
+     }
+
+     .select-img:hover {
+          background-color: #5D7186;
+          border: none;
+          color: white;
+     }
+     .productImages {
+          width: 0;
+          height: 0;
+          margin: 0;
+          padding: 0;
+     }
+     .short-swal-popup {
+          width: 300px; 
+          padding: 0;
+          font-size: 15px;
+     }
+
+     .short-swal-content {
+          font-size: 15px;
+          margin: 0; 
+          padding: 0; 
+     }
+
+     .short-swal-confirm-btn {
+          padding: 5px 10px;
+          font-size: 15px;
+          border-radius: 4px;
+     }
+
+     .short-swal-cancel-btn {
+          padding: 5px 10px;
+          font-size: 15px;
+          border-radius: 4px;
+     }
+
+     
+     .swal2-actions {
+          gap: 5px; 
+     }
+
+     .swal2-icon.swal2-error {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 30px; 
+          height: 30px;
+          margin: 0; 
+          font-size: 15px;
+          line-height: 30px; 
+     }
+
+     .swal2-icon.swal2-error::before {
+          content: '✖'; 
+          color: red;
+     }
+
+     .compact-swal-popup {
+          width: auto !important; 
+          height: auto !important; 
+          padding: 20px 20px !important;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 8px;
+     }
+     .swal2-title {
+          font-size: 18px !important;
+          margin: 0 !important;
+          line-height: 1.5 !important;
+     }
+
+
+     .swal2-html-container {
+          margin: 0 !important; 
+     }
+
+     .swal2-timer-progress-bar {
+      height: 2px !important;
+     }
     </style>
 </head>
 
@@ -62,6 +158,7 @@
                           <div class="card">
                                <div class="card-body">
                                    <!-- Crossfade -->
+                                   <% if(product.variant.length !== 0) { %>
                                    <% if(product.variant.length>1) { %>
                                         <% for(let i = 0; i < product.variant.length; i++) { %>
                                              <div id="image-container<%= i %>" class="image-container carousel carousel-fade">
@@ -91,21 +188,31 @@
                                                   </div>
                                              </div>
                                              <div class="carousel-indicators m-0 mt-2 d-lg-flex d-none position-static h-100">
-                                                  <button id="imgBtn1" type="button" onclick="mainImg(1,0)" data-bs-target="#carouselExampleFade" class="imgBtn w-auto h-auto rounded bg-light active">
-                                                       <img id="img1" src="<%= product.variant[0].image[0] %>" class="d-block rounded avatar-xl" alt="swiper-indicator-img">
+                                                  <button id="imgBtn01" type="button" onclick="mainImg('01',0)" data-bs-target="#carouselExampleFade" class="imgBtn w-auto h-auto rounded bg-light active">
+                                                       <img id="img01" src="<%= product.variant[0].image[0] %>" class="d-block rounded avatar-xl" alt="swiper-indicator-img">
                                                   </button>
-                                                  <button id="imgBtn2" type="button" onclick="mainImg(2,0)" data-bs-target="#carouselExampleFade" class="imgBtn w-auto h-auto rounded bg-light">
-                                                       <img id="img2" src="<%= product.variant[0].image[1] %>" class="d-block rounded avatar-xl" alt="swiper-indicator-img">
+                                                  <button id="imgBtn02" type="button" onclick="mainImg('02',0)" data-bs-target="#carouselExampleFade" class="imgBtn w-auto h-auto rounded bg-light">
+                                                       <img id="img02" src="<%= product.variant[0].image[1] %>" class="d-block rounded avatar-xl" alt="swiper-indicator-img">
                                                   </button>
-                                                  <button id="imgBtn3" type="button" onclick="mainImg(3,0)" data-bs-target="#carouselExampleFade" class="imgBtn w-auto h-auto rounded bg-light">
-                                                       <img id="img3" src="<%= product.variant[0].image[2] %>" class="d-block rounded avatar-xl" alt="swiper-indicator-img">
+                                                  <button id="imgBtn03" type="button" onclick="mainImg('03',0)" data-bs-target="#carouselExampleFade" class="imgBtn w-auto h-auto rounded bg-light">
+                                                       <img id="img03" src="<%= product.variant[0].image[2] %>" class="d-block rounded avatar-xl" alt="swiper-indicator-img">
                                                   </button>
                                              </div>
                                         </div>
                                    <% } %>
+                                   <% } else { %>
+                                        <div id="image-container" class="carousel carousel-fade">
+                                             <div class="carousel-inner">
+                                                  <div class="carousel-item active">
+                                                       No variant found
+                                                  </div>
+                                             </div>
+                                        </div>
+                                  <% } %>
                                </div>
                           </div>
                      </div>
+                    
                      <div class="col-lg-8">
                           <div class="card">
                                <div class="card-body">
@@ -133,7 +240,7 @@
                                              <% } %>
                                         </h4>
                                    <% } %>
-
+                                   <% if(product.variant.length !== 0) { %>
                                     <div class="row align-items-center g-2 mt-3">
                                          <div class="col-lg-12">
                                               <div class="">
@@ -142,12 +249,14 @@
                                                        <% if(product.variant.length>1) { %>
                                                             <% for(let i = 0; i<product.variant.length; i++) { %>
                                                                  <div id="color-container<%= i %>" role="group" aria-label="Basic checkbox toggle button group">
-                                                                      <button id="color<%= i %>" class="btn btn-light" type="button"><%= product.variant[i].color %></button>
+                                                                      <button class="btn btn-light" id="stock-color<%= i %>" type="button"><%= product.variant[i].color %></button>
+                                                                      <button type="button" class="btn btn-soft-primary btn-sm" data-bs-toggle="modal" data-bs-target="#variantModal<%= i %>"><iconify-icon icon="solar:pen-2-broken" class="align-middle fs-18"></iconify-icon></button>
                                                                  </div>
                                                             <% } %>
                                                        <% } else { %>
                                                             <div id="color-container" role="group" aria-label="Basic checkbox toggle button group">
-                                                                 <button class="btn btn-primary" type="button"><%= product.variant[0].color %></button>
+                                                                 <button class="btn btn-light" id="stock-color0" type="button"><%= product.variant[0].color %></button>
+                                                                 <button type="button" class="btn btn-soft-primary btn-sm" data-bs-toggle="modal" data-bs-target="#variantModal0"><iconify-icon icon="solar:pen-2-broken" class="align-middle fs-18"></iconify-icon></button>
                                                             </div>
                                                        <% } %>
                                                   </div>
@@ -159,29 +268,30 @@
                                                   <% if(product.variant.length>1) { %>
                                                        <% for(let i = 0; i<product.variant.length; i++) { %>
                                                             <div id="size-container<%= i %>" class="size-container flex-wrap gap-2" role="group" aria-label="Basic checkbox toggle button group">
-                                                                 <p>XS: <span>  <%= product.variant[i].XS %></span></p>
-                                                                 <p>S: <span><%= product.variant[i].S %></span></p>
-                                                                 <p>M: <span><%= product.variant[i].M %></span></p>
-                                                                 <p>L: <span><%= product.variant[i].L %></span></p>
-                                                                 <p>XL: <span><%= product.variant[i].XL %></span></p>
-                                                                 <p>XXL: <span><%= product.variant[i].XXL %></span></p>
-                                                                 <p>XXXL: <span><%= product.variant[i].XXXL %></span></p>
+                                                                 <p>XS: <span id="stockXS<%= i %>">  <%= product.variant[i].XS %></span></p>
+                                                                 <p>S: <span id="stockS<%= i %>"><%= product.variant[i].S %></span></p>
+                                                                 <p>M: <span id="stockM<%= i %>"><%= product.variant[i].M %></span></p>
+                                                                 <p>L: <span id="stockL<%= i %>"><%= product.variant[i].L %></span></p>
+                                                                 <p>XL: <span id="stockXL<%= i %>"><%= product.variant[i].XL %></span></p>
+                                                                 <p>XXL: <span id="stockXXL<%= i %>"><%= product.variant[i].XXL %></span></p>
+                                                                 <p>XXXL: <span id="stockXXXL<%= i %>"><%= product.variant[i].XXXL %></span></p>
                                                             </div>
                                                        <% } %>
                                                   <% } else { %>
                                                        <div id="size-container" class="d-flex flex-wrap gap-2" role="group" aria-label="Basic checkbox toggle button group">
-                                                            <p>XS: <span>  <%= product.variant[0].XS %></span></p>
-                                                            <p>S: <span><%= product.variant[0].S %></span></p>
-                                                            <p>M: <span><%= product.variant[0].M %></span></p>
-                                                            <p>L: <span><%= product.variant[0].L %></span></p>
-                                                            <p>XL: <span><%= product.variant[0].XL %></span></p>
-                                                            <p>XXL: <span><%= product.variant[0].XXL %></span></p>
-                                                            <p>XXXL: <span><%= product.variant[0].XXXL %></span></p>
+                                                            <p>XS: <span id="stockXS0">  <%= product.variant[0].XS %></span></p>
+                                                            <p>S: <span id="stockS0"><%= product.variant[0].S %></span></p>
+                                                            <p>M: <span id="stockM"><%= product.variant[0].M %></span></p>
+                                                            <p>L: <span id="stockL0"><%= product.variant[0].L %></span></p>
+                                                            <p>XL: <span id="stockXL0"><%= product.variant[0].XL %></span></p>
+                                                            <p>XXL: <span id="stockXXL0"><%= product.variant[0].XXL %></span></p>
+                                                            <p>XXXL: <span id="stockXXXL0"><%= product.variant[0].XXXL %></span></p>
                                                        </div>
                                                   <% } %>
                                              </div>
                                         </div>
                                     </div>
+                                    <% } %>
                                     <div class="d-flex mt-2">
                                         <h4 class="text-dark fw-medium">Category :</h4>
                                         <p class="text-muted ms-2"><%= cateName %></p>
@@ -209,7 +319,189 @@
             <!-- ========== Footer Start ========== -->
             <%- include('../partials/admin/footer') %>
             <!-- ========== Footer End ========== -->
-
+             <!-- Modal -->
+              <% if(product.variant.length !== 0) { %>
+               <% for(let i = 0; i < product.variant.length; i++) { %>
+             <div class="modal fade" id="variantModal<%= i %>" tabindex="-1" aria-labelledby="variantModalLabel" aria-hidden="true">
+               <div class="modal-dialog">
+               <div class="modal-content" style="width: 800px;">
+               <div class="modal-header">
+                    <h5 class="modal-title" id="variantModalLabel<%= i %>">Add Variant</h5>
+                    <button type="button" id="modal-close<%= i %>" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+               </div>
+               <div class="modal-body">
+                    <div class="row">
+                         <div class="col-lg-12">
+                              <div>
+                              <div>
+                                   <div>
+                                   <input type="hidden" id="variantId<%= i %>" value="<%= product.variant[i]._id %>">
+                                   <form id="variant-form<%= i %>">
+                                   <div> 
+                                        <p id="color-error<%= i %>" class="error-message text-danger mb-0"></p>    
+                                        <div class="form-group row mb-3">
+                                             <label class="form-label col-sm-2 col-form-label"
+                                                  for="color<%= i %>">Color picker:</label>
+                                             <div class="col-sm-6">
+                                                  <input type="color" value="<%= product.variant[i].color %>" name="color" class="form-control form-control-color productColor" id="color<%= i %>">
+                                             </div>
+                                        </div>
+                                        <div class="d-flex flex-wrap gap-1">
+                                             <p id="size-error<%= i %>" class="error-message text-danger mb-0"></p>
+                                             <div class="form-group row mt-2">
+                                                  <label
+                                                       class="col-sm-1 col-form-label form-label"
+                                                       for="sizeXS<%= i %>">XS</label>
+                                                  <div class="col-sm-2">
+                                                       <input type="number"
+                                                            class="form-control productSizeXS"
+                                                            id="sizeXS<%= i %>" name="XS" value="<%= product.variant[i].XS %>">
+                                                  </div>
+                                                  <label
+                                                  class="col-sm-1 col-form-label form-label"
+                                                  for="sizeS<%= i %>">S</label>
+                                                  <div class="col-sm-2">
+                                                       <input type="number"
+                                                            class="form-control productSizeS"
+                                                            id="sizeS<%= i %>" name="S" value="<%= product.variant[i].S %>">
+                                                  </div>
+                                                  <label
+                                                  class="col-sm-1 col-form-label form-label"
+                                                  for="sizeM<%= i %>">M</label>
+                                                  <div class="col-sm-2">
+                                                       <input type="number"
+                                                            class="form-control productSizeM"
+                                                            id="sizeM<%= i %>" name="M" value="<%= product.variant[i].M %>">
+                                                  </div>
+                                                  <label
+                                                       class="col-sm-1 col-form-label form-label"
+                                                       for="sizeL<%= i %>">L</label>
+                                                  <div class="col-sm-2">
+                                                       <input type="number"
+                                                            class="form-control productSizeL"
+                                                            id="sizeL<%= i %>" name="L"  value="<%= product.variant[i].L %>">
+                                                  </div>
+                                             </div>
+                                             <div class="form-group row mt-2">
+                                                  <label
+                                                       class="col-sm-1 col-form-label form-label"
+                                                       for="sizeXL<%= i %>">XL</label>
+                                                  <div class="col-sm-2">
+                                                       <input type="number"
+                                                            class="form-control productSizeXL"
+                                                            id="sizeXL<%= i %>" name="XL" value="<%= product.variant[i].XL %>">
+                                                  </div>
+                                                  <label
+                                                       class="col-sm-1 col-form-label form-label"
+                                                       for="sizeXXL<%= i %>">XXL</label>
+                                                  <div class="col-sm-2">
+                                                       <input type="number"
+                                                            class="form-control productSizeXXL"
+                                                            id="sizeXXL<%= i %>" name="XXL" value="<%= product.variant[i].XXL %>">
+                                                  </div>
+                                                  <label
+                                                       class="col-sm-1 col-form-label form-label"
+                                                       for="size3XL<%= i %>">3XL</label>
+                                                  <div class="col-sm-2">
+                                                       <input type="number"
+                                                            class="form-control productSize3XL"
+                                                            id="size3XL<%= i %>" name="XXXL"  value="<%= product.variant[i].XXXL %>">
+                                                  </div>
+                                             </div>    
+                                        </div>
+                                   </div>
+                              </form> 
+                                   <div class="row mt-4">
+                                        <p id="image-error<%= i %>" class="error-message text-danger mb-1"></p>
+                                        <div class="col-lg-4">
+                                             <form enctype="multipart/form-data" id="image1-form<%= i %>">
+                                             <div>
+                                                  <label for="image1-<%= i %>" id="file1-upload<%= i %>"
+                                                       class="form-label select-img">Select an Image</label>
+                                                  <input type="file" id="image1-<%= i %>" name="images"
+                                                       class="form-control productImages"
+                                                       onclick="clearImg(event, 1, '<%= i %>')"
+                                                       accept="image/png, image/jpeg, image/jpg"
+                                                       onchange="viewImage(event, 1, '<%= i %>')">
+                                                  <div>
+                                                       <img id="img1View<%= i %>" style="max-height: 400px;">
+                                                  </div>
+                                             </div>
+                                             <button type="button" id="crop1-save<%= i %>"
+                                                  class="btn btn-outline-secondary mt-2 mb-2">save</button>
+                                             <div id="preview1-cont<%= i %>" class="image-cropper img-thumbnail"
+                                                  style="width: 100%; height: 250px; overflow: hidden;">
+                                                  <img id="file1-preview<%= i %>" src="<%= product.variant[i].image[0] %>"
+                                                       style="max-width: 100%; height: auto;">
+                                             </div>
+                                             <button type="button" id="imagechange1-save<%= i %>" onclick="editVariantImage(event, 1, '<%= i %>')" class="btn btn-outline-primary mt-2 mb-2 display-none">save changes</button>
+                                        </form>
+                                        </div>
+                                        <div class="col-lg-4">
+                                             <form enctype="multipart/form-data" id="image2-form<%= i %>">
+                                             <div>
+                                                  <label for="image2-<%= i %>" id="file2-upload<%= i %>"
+                                                       class="form-label select-img">Select an Image</label>
+                                                  <input type="file" id="image2-<%= i %>" name="images"
+                                                       class="form-control productImages"
+                                                       onclick="clearImg(event, 2, '<%= i %>')"
+                                                       accept="image/png, image/jpeg, image/jpg"
+                                                       onchange="viewImage(event, 2, '<%= i %>')">
+                                                  <div>
+                                                       <img id="img2View<%= i %>" style="max-height: 400px;">
+                                                  </div>
+                                                  
+                                             </div>
+                                             <button type="button" id="crop2-save<%= i %>"
+                                                  class="btn btn-outline-secondary mt-2 mb-2">save</button>
+                                             <div id="preview2-cont<%= i %>" class="image-cropper img-thumbnail"
+                                                  style="width: 100%; height: 250px; overflow: hidden;">
+                                                  <img id="file2-preview<%= i %>" src="<%= product.variant[i].image[1] %>"
+                                                       style="max-width: 100%; height: auto;">
+                                             </div>
+                                             <button type="button" id="imagechange2-save<%= i %>" onclick="editVariantImage(event, 2, '<%= i %>')" class="btn btn-outline-primary mt-2 mb-2 display-none">save changes</button>
+                                        </form>
+                                        </div>
+                                        <div class="col-lg-4">
+                                             <form enctype="multipart/form-data" id="image3-form<%= i %>">
+                                             <div>
+                                                  <label for="image3-<%= i %>" id="file3-upload<%= i %>"
+                                                       class="form-label select-img">Select an Image</label>
+                                                  <input type="file" id="image3-<%= i %>" name="images"
+                                                       class="form-control productImages"
+                                                       accept="image/png, image/jpeg, image/jpg"
+                                                       onchange="viewImage(event, 3, '<%= i %>')"
+                                                       onclick="clearImg(event, 3, '<%= i %>')">
+                                                  <div>
+                                                       <img id="img3View<%= i %>" style="max-height: 400px;"> 
+                                                  </div>
+                                             </div>
+                                             <button type="button" id="crop3-save<%= i %>"
+                                                  class="btn btn-outline-secondary mt-2 mb-2">save</button>
+                                             <div id="preview3-cont<%= i %>" class="image-cropper img-thumbnail"
+                                                  style="width: 100%; height: 250px; overflow: hidden;">
+                                                  <img id="file3-preview<%= i %>" src="<%= product.variant[i].image[2] %>"
+                                                       style="max-width: 100%; height: auto;">
+                                             </div>
+                                             <button type="button" id="imagechange3-save<%= i %>" onclick="editVariantImage(event, 3, '<%= i %>')" class="btn btn-outline-primary mt-2 mb-2 display-none">save changes</button>
+                                        </form>  
+                                        </div>   
+                                        </div>
+                                   </div>    
+                              </div>
+                         </div>
+                         </div>
+                    </div>
+               </div>
+               <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="save-variant<%= i %>" onclick="editVariants(event, '<%= i %>', '<%= product.variant[i]._id %>')" class="btn btn-primary">Save changes</button>
+               </div>
+               </div>
+               </div>
+          </div>
+          <% } %>
+          <% } %>
         </div>
         <!-- ==================================================== -->
         <!-- End Page Content -->
@@ -225,7 +517,7 @@
     <script src="js/app.js"></script>
 
     <script src="js/pages/product-details.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
     <script>
      const variantLength = document.getElementById('product-name').dataset.variantlen;
      if(variantLength>1) {
@@ -234,7 +526,7 @@
           document.getElementById('image-container0').style.display = 'block';
       
           for(let i = 0; i<variantLength; i++) {
-               document.getElementById('color'+i).addEventListener('click', () => {
+               document.getElementById('color-container'+i).addEventListener('click', () => {
                     document.querySelectorAll('.image-container').forEach(element => {
                          element.style.display = 'none';
                     });
@@ -252,12 +544,272 @@
                });
           }
      }
+
      function mainImg(imgIndex, mainIndex) {
           document.getElementById(`mainImg${mainIndex}`).src =  document.getElementById(`img${imgIndex}`).src;
           document.querySelectorAll('.imgBtn').forEach(element => {
                element.classList.remove('active');
           })
           document.getElementById(`imgBtn${imgIndex}`).classList.add('active');
+     }
+
+     
+     function clearImg(event , index1, index2) {
+          const imgView = document.getElementById(`img${index1}View${index2}`);
+          const image = document.getElementById(`img${index2}${index1}`).src;
+          if(imgView.cropper) {
+               imgView.cropper.destroy();
+               imgView.parentNode.innerHTML = `<img id="img${index1}View${index2}" src="" style="max-height: 500px;"/>`;
+               document.getElementById(`file${index1}-preview${index2}`).src = image;
+          }
+          document.getElementById(`imagechange${index1}-save${index2}`).style.display = 'none';
+     }
+
+     function viewImage(event, index1, index2) {
+          if(!event.target.files[0]) {
+               return;
+          }
+          if(!validateImage(event.target.files[0])) {
+               return;
+          }
+          document.getElementById(`img${index1}View${index2}`).src = URL.createObjectURL(event.target.files[0]);
+          imgHandler(event, index1, index2);
+     }
+
+     function imgHandler(event, index1, index2) {
+          let input = event.target;
+          let reader = new FileReader();
+          reader.onload = function () {
+               let dataURL = reader.result;
+               let image = document.getElementById(`img${index1}View${index2}`);
+               image.src = dataURL;
+               // Create the cropper instance
+               let cropper = new Cropper(image, {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    guides: true,
+                    background: false,
+                    autoCropArea: 1,
+                    zoomable: true
+               });
+               // Attach event listener to save button
+               let saveButton = document.getElementById(`crop${index1}-save${index2}`);
+               if(saveButton._listener) {
+                    saveButton.removeEventListener('click', saveButton._listener);
+               }
+               saveButton.addEventListener('click', async function saveCropped() {
+                    saveButton._listener = saveCropped;
+                    let croppedCanvas = cropper.getCroppedCanvas();
+                    let croppedImage = document.getElementById(`file${index1}-preview${index2}`);
+                    croppedImage.src = croppedCanvas.toDataURL('image/jpeg', 1.0);
+                    let timestamp = new Date().getTime();
+                    let color = document.getElementById(`color${index2}`).value;
+                    let extractClr = color.slice(1);
+                    let fileName = `cropped-img-${timestamp}-${extractClr}-${index1-1}.png`;
+                    // Convert cropped canvas to Blob and update the input file
+                    await croppedCanvas.toBlob(blob => {
+                         let input = document.getElementById(`image${index1}-${index2}`);
+                         let imgFile = new File([blob], fileName, blob);
+                         const fileList = new DataTransfer();
+                         fileList.items.add(imgFile);
+                         input.files = fileList.files;
+
+                    });
+                    document.getElementById(`imagechange${index1}-save${index2}`).style.display = 'block';
+               });
+          };
+          reader.readAsDataURL(input.files[0]);
+     }
+
+     function validateImage(file) {
+          if(!file) {
+               return false;
+          }
+          const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+          if(!allowedTypes.includes(file.type)) {
+               return false;
+          }
+          const maxSize = 2 * 1024 * 1024;
+          if(file.size > maxSize) {
+               return false;
+          }
+          return true;
+     }
+
+     function variantValidation(index) {
+          clearErrorMessage();
+          const color = document.getElementById(`color${index}`).value;
+          const sizeXS = document.getElementById(`sizeXS${index}`).value;
+          const sizeS = document.getElementById(`sizeS${index}`).value;
+          const sizeM = document.getElementById(`sizeM${index}`).value;
+          const sizeL = document.getElementById(`sizeL${index}`).value;
+          const sizeXL = document.getElementById(`sizeXL${index}`).value;
+          const sizeXXL = document.getElementById(`sizeXXL${index}`).value;
+          const size3XL = document.getElementById(`size3XL${index}`).value;
+          const images = document.getElementsByName(`images${index}`);
+
+          let isChecked = true;
+          const digitReg = /^\d+$/;
+     
+          if(!color) {
+               isChecked = false;
+               showError(`color-error${index}`, 'color is required.');
+          }
+          if(!digitReg.test(sizeXS) || sizeXS<0 || !/^\d+$/.test(sizeS) || sizeS<0 || !/^\d+$/.test(sizeM) || sizeM<0 || !/^\d+$/.test(sizeL) || sizeL<0 || !/^\d+$/.test(sizeXL) || sizeXL<0 || !/^\d+$/.test(sizeXXL) || sizeXXL<0 || !/^\d+$/.test(size3XL) || size3XL<0 ) {
+               showError(`size-error${index}`, 'All size quantity required and it should be non negative.');
+               isChecked = false;
+          }
+     
+          // for(let i = 0; i< images.length; i++) {
+          //      if(images[i].files.length === 0) {
+          //           showError(`image-error${index}`, 'All images required.');
+          //           isChecked = false;
+          //           return;
+          //      } else if(images[i].files[0].size>(2*1024*1024)) {
+          //           isValid = false;
+          //           showError(`image-error${index}`, `image ${i+1} file size too large, Please choose an image smaller than 2 MB.`);
+          //           return;
+          //      }
+          // }
+
+          return isChecked
+     }
+
+     async function editVariants(event, index, variantId) {
+          event.preventDefault();
+          try {
+               if(!variantValidation(index)) {
+                    return;
+               }
+               const variantForm = document.getElementById(`variant-form${index}`);
+               const formData = new FormData(variantForm);
+               const response = await fetch(`/admin/product/editVariant?productId=<%= product._id %>&variantId=${variantId}`, {
+                    method:'PATCH',
+                    body: formData
+               });
+               const data = await response.json();
+               if(!response.ok) {
+                    throw new Error(data.message);
+               }
+               if(data.success) {
+                    document.getElementById(`stock-color${index}`).innerHTML = document.getElementById(`color${index}`).value;
+                    document.getElementById(`stockXS${index}`).innerHTML = document.getElementById(`sizeXS${index}`).value;
+                    document.getElementById(`stockS${index}`).innerHTML = document.getElementById(`sizeS${index}`).value;
+                    document.getElementById(`stockM${index}`).innerHTML = document.getElementById(`sizeM${index}`).value;
+                    document.getElementById(`stockL${index}`).innerHTML = document.getElementById(`sizeL${index}`).value;
+                    document.getElementById(`stockXL${index}`).innerHTML = document.getElementById(`sizeXL${index}`).value;
+                    document.getElementById(`stockXXL${index}`).innerHTML = document.getElementById(`sizeXXL${index}`).value;
+                    document.getElementById(`stockXXXL${index}`).innerHTML = document.getElementById(`size3XL${index}`).value;
+                    Swal.fire({
+                         position: "top-end",
+                         html: `
+                              <div style="display: flex; align-items: center; gap: 10px;">
+                                   <div>
+                                        <div class="swal2-icon swal2-success" style="width: 30px; height: 30px; margin: 0; font-size: 16px;"></div>
+                                   </div>
+                                   <div style="font-size: 20px; text-align: left;">Edited successfully!</div>
+                              </div>
+                         `,
+                         showConfirmButton: false,
+                         timer: 1500,
+                         customClass: {
+                              popup: 'compact-swal-popup',
+                         }
+                    })
+                    .then(() => {
+                         document.getElementById(`modal-close${index}`).click();
+                    })
+               }
+          } catch (error) {
+               Swal.fire({
+                    position: "top-end",
+                    html: `
+                         <div style="display: flex; align-items: center; gap: 10px;">
+                              <div>
+                                   <div class="swal2-icon swal2-error" style="width: 30px; height: 30px; margin: 0; font-size: 16px;"></div>
+                              </div>
+                              <div style="font-size: 20px; text-align: left;">Oops... ${error.message}</div>
+                         </div>
+                    `,
+                    showConfirmButton: false,
+                    timer: 1500,
+                    customClass: {
+                         popup: 'compact-swal-popup',
+                    }
+               });
+          }
+     }
+
+     async function editVariantImage(event, index1, index2,) {
+          event.preventDefault();
+          try {
+               const variantId = document.getElementById(`variantId${index2}`).value;
+               const imageForm = document.getElementById(`image${index1}-form${index2}`);
+               const formData = new FormData(imageForm);
+               const response = await fetch(`/admin/product/editImage?productId=<%= product._id %>&variantId=${variantId}&index=${Number(index1 - 1)}`, {
+                    method:'PATCH',
+                    body: formData
+               });
+               const data = await response.json();
+               if(!response.ok) {
+                    throw new Error(data.message);
+               }
+               if(data.success) {
+                    const thumbnail = document.getElementById(`img${index2}${index1}`);
+                    const mainImg = document.getElementById(`mainImg${index2}`)
+                    if(thumbnail.src === mainImg.src) {
+                         thumbnail.src = data.image;
+                         mainImg.src = data.image;
+                    } else {
+                         thumbnail.src = data.image;
+                    }
+                    Swal.fire({
+                         position: "top-end",
+                         html: `
+                              <div style="display: flex; align-items: center; gap: 10px;">
+                                   <div>
+                                        <div class="swal2-icon swal2-success" style="width: 30px; height: 30px; margin: 0; font-size: 16px;"></div>
+                                   </div>
+                                   <div style="font-size: 20px; text-align: left;">Edited successfully!</div>
+                              </div>
+                         `,
+                         showConfirmButton: false,
+                         timer: 1500,
+                         customClass: {
+                              popup: 'compact-swal-popup',
+                         }
+                    })
+                    .then(() => {
+                         document.getElementById(`modal-close${index2}`).click();
+                    })
+               }
+          } catch (error) {
+               Swal.fire({
+                    position: "top-end",
+                    html: `
+                         <div style="display: flex; align-items: center; gap: 10px;">
+                              <div>
+                                   <div class="swal2-icon swal2-error" style="width: 30px; height: 30px; margin: 0; font-size: 16px;"></div>
+                              </div>
+                              <div style="font-size: 20px; text-align: left;">Oops... ${error.message}</div>
+                         </div>
+                    `,
+                    showConfirmButton: false,
+                    timer: 1500,
+                    customClass: {
+                         popup: 'compact-swal-popup',
+                    }
+               });
+          }
+     }
+
+     function showError(elementId, message) {
+          document.getElementById(elementId).style.display = 'block';
+          document.getElementById(elementId).textContent = message;
+     }
+
+     function clearErrorMessage() {
+          document.querySelectorAll('.error-message').forEach(element => element.style.display = 'none');
      }
 
      async function logout() {

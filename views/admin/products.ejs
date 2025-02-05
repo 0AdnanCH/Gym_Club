@@ -27,7 +27,7 @@
      <!-- Theme Config js (Require in all Page) -->
      <script src="js/config.js"></script>
      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
      <style>
      .short-swal-popup {
           width: 300px; 
@@ -97,6 +97,35 @@
      .swal2-timer-progress-bar {
       height: 2px !important;
      }
+     .select-img {
+          background: transparent;
+          padding: 10px 15px;
+          border-radius: 10px;
+          font-weight: bold;
+          color: gray;
+          text-transform: uppercase;
+          cursor: pointer;
+          font-family: Avenir, Helvetica, Arial, sans-serif;
+          font-size: 11px;
+          transition: box-shadow ease 0.25s;
+          border: 1px solid gray;
+
+     }
+
+     .select-img:hover {
+          background-color: #5D7186;
+          border: none;
+          color: white;
+     }
+     .productImages {
+          width: 0;
+          height: 0;
+          margin: 0;
+          padding: 0;
+     }
+     .error-message {
+          display: none;
+     }
      </style>
 </head>
 
@@ -154,16 +183,21 @@
                                                             </td>
                                                             <td>
                                                                  <div class="d-flex align-items-center gap-2">
+                                                                      <% if(data[i].variant.length>0) { %>
                                                                       <div class="rounded bg-light avatar-md d-flex 1align-items-center justify-content-center">
                                                                            <img src="<%= data[i].variant[0].image[0] %>" alt="" class="avatar-md">
                                                                       </div>
+                                                                      <% } else { %>
+                                                                           <div class="rounded bg-light avatar-md d-flex align-items-center justify-content-center">
+                                                                           </div>
+                                                                      <% } %>
                                                                       <div>
                                                                            <p class="text-dark fw-medium fs-15"><%= data[i].productName %></p>
                                                                       </div>
                                                                  </div>
 
                                                             </td>
-                                                            <td><%= data[i].variant.length %></td>
+                                                            <td id="noof-variant<%= i %>"><%= data[i].variant.length %></td>
                                                             <td><%= data[i].salePrice %></td>
                                                             <td> <%= data[i].category.name %></td>
                                                             <td>
@@ -177,14 +211,189 @@
                                                                       <button class="btn btn-success" id="unblock-btn<%= i %>" onclick="unblockProduct(event, '<%= data[i]._id %>', '<%= i %>')">Unblock</button>
                                                                       <% } %>
                                                                       <a href="/admin/editProduct?id=<%= data[i]._id %>" class="btn btn-info text-white">Edit</a>
+                                                                      <!-- Button trigger modal -->
+                                                                      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#variantModal" onclick="addVariantModal('<%= data[i]._id %>', '<%= i %>')">
+                                                                           + Variant
+                                                                      </button>
                                                                  </div>
                                                             </td>
                                                        </tr>
                                                        <% } %>
                                                   </tbody>
                                              </table>
-                                        </div>
+                                        </div> 
                                         <!-- end table-responsive -->
+                                   </div>
+                                     <!-- Modal -->
+                                     <div class="modal fade" id="variantModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                        <div class="modal-content" style="width: 800px;">
+                                        <div class="modal-header">
+                                             <h5 class="modal-title" id="exampleModalLabel">Add Variant</h5>
+                                             <button type="button" id="modal-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                              <div class="row">
+                                   <div class="col-lg-12">
+                                        <div>
+                                        <div id="variant-add-cont">
+                                             <div>
+                                             <input type="hidden" id="exist-noof-variant">
+                                             <form id="variant-form" enctype="multipart/form-data">
+                                             <input type="hidden" name="productId" id="productId">
+                                             <div id="variants-cont"> 
+                                                  <p id="color-error" class="error-message text-danger mb-0"></p>    
+                                                  <div class="form-group row mb-3">
+                                                       <label class="form-label col-sm-2 col-form-label"
+                                                            for="color">Color picker:</label>
+                                                       <div class="col-sm-6">
+                                                            <input type="color" name="color" class="form-control form-control-color productColor" id="color">
+                                                       </div>
+                                                  </div>
+                                                  <div class="d-flex flex-wrap gap-1">
+                                                       <p id="size-error" class="error-message text-danger mb-0"></p>
+                                                       <div class="form-group row mt-2">
+                                                            <label
+                                                                 class="col-sm-1 col-form-label form-label"
+                                                                 for="sizeXS">XS</label>
+                                                            <div class="col-sm-2">
+                                                                 <input type="number"
+                                                                      class="form-control productSizeXS"
+                                                                      id="sizeXS" name="XS">
+                                                            </div>
+                                                            <label
+                                                            class="col-sm-1 col-form-label form-label"
+                                                            for="sizeS">S</label>
+                                                            <div class="col-sm-2">
+                                                                 <input type="number"
+                                                                      class="form-control productSizeS"
+                                                                      id="sizeS" name="S">
+                                                            </div>
+                                                            <label
+                                                            class="col-sm-1 col-form-label form-label"
+                                                            for="sizeM">M</label>
+                                                            <div class="col-sm-2">
+                                                                 <input type="number"
+                                                                      class="form-control productSizeM"
+                                                                      id="sizeM" name="M">
+                                                            </div>
+                                                            <label
+                                                                 class="col-sm-1 col-form-label form-label"
+                                                                 for="sizeL">L</label>
+                                                            <div class="col-sm-2">
+                                                                 <input type="number"
+                                                                      class="form-control productSizeL"
+                                                                      id="sizeL" name="L">
+                                                            </div>
+                                                       </div>
+                                                       <div class="form-group row mt-2">
+                                                            <label
+                                                                 class="col-sm-1 col-form-label form-label"
+                                                                 for="sizeXL">XL</label>
+                                                            <div class="col-sm-2">
+                                                                 <input type="number"
+                                                                      class="form-control productSizeXL"
+                                                                      id="sizeXL" name="XL">
+                                                            </div>
+                                                            <label
+                                                                 class="col-sm-1 col-form-label form-label"
+                                                                 for="sizeXXL">XXL</label>
+                                                            <div class="col-sm-2">
+                                                                 <input type="number"
+                                                                      class="form-control productSizeXXL"
+                                                                      id="sizeXXL" name="XXL">
+                                                            </div>
+                                                            <label
+                                                                 class="col-sm-1 col-form-label form-label"
+                                                                 for="size3XL">3XL</label>
+                                                            <div class="col-sm-2">
+                                                                 <input type="number"
+                                                                      class="form-control productSize3XL"
+                                                                      id="size3XL" name="XXXL">
+                                                            </div>
+                                                       </div>    
+                                                  </div>
+                                             </div>
+                                             <div class="row mt-4">
+                                                  <p id="image-error" class="error-message text-danger mb-1"></p>
+                                                  <div class="col-lg-4">
+                                                       <div>
+                                                            <label for="image1" id="file1-upload"
+                                                                 class="form-label select-img">Select an Image</label>
+                                                            <input type="file" id="image1" name="images"
+                                                                 class="form-control productImages"
+                                                                 onclick="clearImg(event, 1)"
+                                                                 accept="image/png, image/jpeg, image/jpg"
+                                                                 onchange="viewImage(event, 1)">
+                                                            <div>
+                                                                 <img id="img1View" style="max-height: 400px;">
+                                                            </div>
+                                                       </div>
+                                                       <button type="button" id="crop1-save"
+                                                            class="btn btn-outline-secondary mt-2 mb-2">save</button>
+                                                       <div id="preview1-cont" class="image-cropper img-thumbnail"
+                                                            style="width: 100%; height: 250px; overflow: hidden;">
+                                                            <img id="file1-preview"
+                                                                 style="max-width: 100%; height: auto;">
+                                                       </div>
+                                                  </div>
+                                                  <div class="col-lg-4">
+                                                       <div>
+                                                            <label for="image2" id="file2-upload"
+                                                                 class="form-label select-img">Select an Image</label>
+                                                            <input type="file" id="image2" name="images"
+                                                                 class="form-control productImages"
+                                                                 onclick="clearImg(event, 2)"
+                                                                 accept="image/png, image/jpeg, image/jpg"
+                                                                 onchange="viewImage(event, 2)">
+                                                            <div>
+                                                                 <img id="img2View" style="max-height: 400px;">
+                                                            </div>
+                                                            
+                                                       </div>
+                                                       <button type="button" id="crop2-save"
+                                                            class="btn btn-outline-secondary mt-2 mb-2">save</button>
+                                                       <div id="preview2-cont" class="image-cropper img-thumbnail"
+                                                            style="width: 100%; height: 250px; overflow: hidden;">
+                                                            <img id="file2-preview"
+                                                                 style="max-width: 100%; height: auto;">
+                                                       </div>
+                                                  </div>
+                                                  <div class="col-lg-4">
+                                                       <div>
+                                                            <label for="image3" id="file3-upload"
+                                                                 class="form-label select-img">Select an Image</label>
+                                                            <input type="file" id="image3" name="images"
+                                                                 class="form-control productImages"
+                                                                 accept="image/png, image/jpeg, image/jpg"
+                                                                 onchange="viewImage(event, 3)"
+                                                                 onclick="clearImg(event, 3)">
+                                                            <div>
+                                                                 <img id="img3View" style="max-height: 400px;"> 
+                                                            </div>
+                                                       </div>
+                                                       <button type="button" id="crop3-save"
+                                                            class="btn btn-outline-secondary mt-2 mb-2">save</button>
+                                                       <div id="preview3-cont" class="image-cropper img-thumbnail"
+                                                            style="width: 100%; height: 250px; overflow: hidden;">
+                                                            <img id="file3-preview"
+                                                                 style="max-width: 100%; height: auto;">
+                                                       </div>
+                                                  </div>     
+                                             </div>
+                                        </form> 
+                                        </div>    
+                                   </div>
+                              </div>
+                         </div>
+                    </div>
+               </div>
+                                        <div class="modal-footer">
+                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                             <button type="button" id="save-variant" class="btn btn-primary">Save changes</button>
+                                        </div>
+                                        </div>
+                                        </div>
                                    </div>
                                    <div class="card-footer border-top">
                                         <nav aria-label="Page navigation example">
@@ -206,7 +415,6 @@
                          </div>
 
                     </div>
-
                </div>
                <!-- End Container Fluid -->
 
@@ -227,6 +435,7 @@
 
      <!-- App Javascript (Require in all Page) -->
      <script src="js/app.js"></script>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
      <script>
           async function blockProduct(event, id, i) {
                event.preventDefault();
@@ -325,32 +534,225 @@
                }
           }
 
-     async function logout() {
-          try {
-               const response = await fetch('/admin/logout', {method: 'POST'})
-               const data = await response.json();
-               if(!response.ok) {
-                    throw new Error(data.message);
+          function clearImg(event , index1) {
+               const imgView = document.getElementById(`img${index1}View`);
+               if(imgView.cropper) {
+                    imgView.cropper.destroy();
+                    imgView.parentNode.innerHTML = `<img id="img${index1}View" src="" style="max-height: 500px;"/>`;
+                    document.getElementById(`file${index1}-preview`).src = '';
                }
-               if(data.success) {
-                    window.location.href = '/admin/login'
-               }
-          } catch (error) {
-               Swal.fire({
-                    position: "top-end",
-                    icon: "error",
-                    title: "Oops...",
-                    text: error.message,
-                    showConfirmButton: false,
-                    timer: 1500,
-                    customClass: {
-                         popup: 'custom-swal-popup'
-                    }
-               });
           }
-     }
 
-     document.getElementById('logout-btn').addEventListener('click', logout);
+          function viewImage(event, index1) {
+               if(!event.target.files[0]) {
+                    return;
+               }
+               if(!validateImage(event.target.files[0])) {
+                    return;
+               }
+               document.getElementById(`img${index1}View`).src = URL.createObjectURL(event.target.files[0]);
+               imgHandler(event, index1);
+          }
+
+          function addVariantModal(productId, index) {
+               document.getElementById('productId').value = productId;
+               document.getElementById('exist-noof-variant').value = index;
+          }
+
+          function imgHandler(event, index1) {
+               let input = event.target;
+               let reader = new FileReader();
+               reader.onload = function () {
+                    let dataURL = reader.result;
+                    let image = document.getElementById(`img${index1}View`);
+                    image.src = dataURL;
+                    // Create the cropper instance
+                    let cropper = new Cropper(image, {
+                         aspectRatio: 1,
+                         viewMode: 1,
+                         guides: true,
+                         background: false,
+                         autoCropArea: 1,
+                         zoomable: true
+                    });
+                    // Attach event listener to save button
+                    let saveButton = document.getElementById(`crop${index1}-save`);
+                    if(saveButton._listener) {
+                         saveButton.removeEventListener('click', saveButton._listener);
+                    }
+                    saveButton.addEventListener('click', async function saveCropped() {
+                         saveButton._listener = saveCropped;
+                         let croppedCanvas = cropper.getCroppedCanvas();
+                         let croppedImage = document.getElementById(`file${index1}-preview`);
+                         croppedImage.src = croppedCanvas.toDataURL('image/jpeg', 1.0);
+                         let timestamp = new Date().getTime();
+                         let color = document.getElementById('color').value;
+                         let extractClr = color.slice(1);
+                         let fileName = `cropped-img-${timestamp}-${extractClr}-${index1-1}.png`;
+                         
+                         // Convert cropped canvas to Blob and update the input file
+                         await croppedCanvas.toBlob(blob => {
+                              let input = document.getElementById(`image${index1}`);
+                              let imgFile = new File([blob], fileName, blob);
+                              const fileList = new DataTransfer();
+                              fileList.items.add(imgFile);
+                              input.files = fileList.files;
+                         });
+                    });
+               };
+               reader.readAsDataURL(input.files[0]);
+          }
+
+          function validateImage(file) {
+               if(!file) {
+                    return false;
+               }
+               const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+               if(!allowedTypes.includes(file.type)) {
+                    return false;
+               }
+               const maxSize = 2 * 1024 * 1024;
+               if(file.size > maxSize) {
+                    return false;
+               }
+               return true;
+          }
+
+          async function addVariants(event) {
+               event.preventDefault();
+               try {
+                    if(!variantValidation()) {
+                         return;
+                    }
+                    const variantForm = document.getElementById('variant-form');
+                    const formData = new FormData(variantForm);
+                    const response = await fetch('/admin/product/addVariant', {
+                         method:'PATCH',
+                         body: formData
+                    });
+                    const data = await response.json();
+                    if(!response.ok) {
+                         throw new Error(data.message);
+                    }
+                    if(data.success) {
+                         const index = document.getElementById('exist-noof-variant').value;
+                         document.getElementById(`noof-variant${index}`).innerHTML = data.noOfVariant;
+                         Swal.fire({
+                              position: "top-end",
+                              html: `
+                                   <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div>
+                                             <div class="swal2-icon swal2-success" style="width: 30px; height: 30px; margin: 0; font-size: 16px;"></div>
+                                        </div>
+                                        <div style="font-size: 20px; text-align: left;">Added successfully!</div>
+                                   </div>
+                              `,
+                              showConfirmButton: false,
+                              timer: 1500,
+                              customClass: {
+                                   popup: 'compact-swal-popup',
+                              }
+                         })
+                         .then(() => {
+                              document.getElementById('modal-close').click();
+                         })
+                    }
+               } catch (error) {
+                    Swal.fire({
+                         position: "top-end",
+                         html: `
+                              <div style="display: flex; align-items: center; gap: 10px;">
+                                   <div>
+                                        <div class="swal2-icon swal2-error" style="width: 30px; height: 30px; margin: 0; font-size: 16px;"></div>
+                                   </div>
+                                   <div style="font-size: 20px; text-align: left;">Oops... ${error.message}</div>
+                              </div>
+                         `,
+                         showConfirmButton: false,
+                         timer: 1500,
+                         customClass: {
+                              popup: 'compact-swal-popup',
+                         }
+                    });
+               }
+          }
+
+          document.getElementById('save-variant').addEventListener('click', addVariants);
+
+          function variantValidation() {
+               clearErrorMessage();
+               const color = document.getElementById('color').value;
+               const sizeXS = document.getElementById('sizeXS').value;
+               const sizeS = document.getElementById('sizeS').value;
+               const sizeM = document.getElementById('sizeM').value;
+               const sizeL = document.getElementById('sizeL').value;
+               const sizeXL = document.getElementById('sizeXL').value;
+               const sizeXXL = document.getElementById('sizeXXL').value;
+               const size3XL = document.getElementById('size3XL').value;
+               const images = document.getElementsByName('images');
+
+               let isChecked = true;
+               const digitReg = /^\d+$/;
+        
+               if(!color) {
+                    isChecked = false;
+                    showError('color-error', 'color is required.');
+               }
+               if(!digitReg.test(sizeXS) || sizeXS<0 || !/^\d+$/.test(sizeS) || sizeS<0 || !/^\d+$/.test(sizeM) || sizeM<0 || !/^\d+$/.test(sizeL) || sizeL<0 || !/^\d+$/.test(sizeXL) || sizeXL<0 || !/^\d+$/.test(sizeXXL) || sizeXXL<0 || !/^\d+$/.test(size3XL) || size3XL<0 ) {
+                    showError('size-error', 'All size quantity required and it should be non negative.');
+                    isChecked = false;
+               }
+          
+               for(let i = 0; i< images.length; i++) {
+                    if(images[i].files.length === 0) {
+                         showError('image-error', 'All images required.');
+                         isChecked = false;
+                         return;
+                    } else if(images[i].files[0].size>(2*1024*1024)) {
+                         isValid = false;
+                         showError('image-error', `image ${i+1} file size too large, Please choose an image smaller than 2 MB.`);
+                         return;
+                    }
+               }
+
+               return isChecked
+          }
+
+          function showError(elementId, message) {
+               document.getElementById(elementId).style.display = 'block';
+               document.getElementById(elementId).textContent = message;
+          }
+
+          function clearErrorMessage() {
+               document.querySelectorAll('.error-message').forEach(element => element.style.display = 'none');
+          }
+
+          async function logout() {
+               try {
+                    const response = await fetch('/admin/logout', {method: 'POST'});
+                    const data = await response.json();
+                    if(!response.ok) {
+                         throw new Error(data.message);
+                    }
+                    if(data.success) {
+                         window.location.href = '/admin/login'
+                    }
+               } catch (error) {
+                    Swal.fire({
+                         position: "top-end",
+                         icon: "error",
+                         title: "Oops...",
+                         text: error.message,
+                         showConfirmButton: false,
+                         timer: 1500,
+                         customClass: {
+                              popup: 'custom-swal-popup'
+                         }
+                    });
+               }
+          }
+
+          document.getElementById('logout-btn').addEventListener('click', logout);
 
      </script>
 </body>
