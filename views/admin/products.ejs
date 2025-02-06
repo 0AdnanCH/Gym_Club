@@ -591,13 +591,13 @@
                          let fileName = `cropped-img-${timestamp}-${extractClr}-${index1-1}.png`;
                          
                          // Convert cropped canvas to Blob and update the input file
-                         await croppedCanvas.toBlob(blob => {
-                              let input = document.getElementById(`image${index1}`);
-                              let imgFile = new File([blob], fileName, blob);
-                              const fileList = new DataTransfer();
-                              fileList.items.add(imgFile);
-                              input.files = fileList.files;
-                         });
+                         // await croppedCanvas.toBlob(blob => {
+                         //      let input = document.getElementById(`image${index1}`);
+                         //      let imgFile = new File([blob], fileName, blob);
+                         //      const fileList = new DataTransfer();
+                         //      fileList.items.add(imgFile);
+                         //      input.files = fileList.files;
+                         // });
                     });
                };
                reader.readAsDataURL(input.files[0]);
