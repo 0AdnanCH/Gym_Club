@@ -12,7 +12,6 @@ const getAddProduct = async (req, res) => {
     const category = await Category.find({isListed: true});
     res.render('product-add', {cat: category, heading: 'Create Product'});
   } catch (error) {
-    console.log('Product Add Error', error);
     res.redirect('/admin/pageError');
   }
 }
@@ -41,7 +40,6 @@ const addProduct = async (req, res) => {
       return res.status(409).json({success: false, message:'Product already exist, Please try another another name'});
     }
   } catch (error) {
-    console.error('Product Add Error', error);
     res.status(500).json({success: false, message: 'Internal Server Error'});
   }
 }
@@ -68,7 +66,6 @@ const getAllProducts = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Product Get Error', error);
     res.redirect('/admin/pageError');
   }
 }
@@ -76,14 +73,12 @@ const getAllProducts = async (req, res) => {
 const blockProduct = async (req, res) => {
   try {
     const id = req.query.id;
-    console.log(id)
     if(!id) {
       return res.status(404).json({success: false, message: 'Product id not found'}); 
     }
     await Product.updateOne({_id:id}, {$set: {isBlocked: true}});
     return res.status(200).json({success: true});
   } catch (error) {
-    console.error('Block Product Error', error);
     res.status(500).json({success: false, message: 'Internal server error'});
   }
 }
@@ -97,7 +92,6 @@ const unblockProduct = async (req, res) => {
     await Product.updateOne({_id:id}, {$set: {isBlocked: false}});
     return res.json({success: true});
   } catch (error) {
-    console.error('Unblock Product Error', error);
     res.status(500).json({success: false, message: 'Failed to unblock product'});
   }
 }
@@ -111,7 +105,6 @@ const getEditProduct = async (req, res) => {
     let index = 0
     res.render('product-edit', {product, category, index, heading: 'Product Edit'});
   } catch (error) {
-    console.error('Get Edit Product Error', error);
     res.redirect('/admin/pageError');
   }
 }
@@ -144,33 +137,7 @@ const editProduct = async (req, res) => {
     await Product.findOneAndUpdate({_id: id}, {$set: updateFields}, {new:true});
     res.status(200).json({success: true});
   } catch (error) {
-    console.error('Edit Product Error', error);
     res.status(500).json({success: false, message: 'Internal Server Error'});
-  }
-}
-
-
-const deleteSingleImage = async (req, res) => {
-  try {
-    const {imageNameToServer, productIdToServer} = req.body;
-    const dltImage = imageNameToServer.split('{')[1];
-    const productImage = await Product.findOne({_id:productIdToServer}, {_id:0,productImage:1});
-    const imageName = productImage.productImage.find(image => image.includes(dltImage))
-    
-    const product = await Product.findByIdAndUpdate(productIdToServer, {$pull:{productImage:imageName}});
-    
-    const imagePath = path.join('uploads', imageName);
-
-    if(fs.existsSync(imagePath)) {
-      await fs.unlinkSync(imagePath);
-      console.log(`Image ${dltImage} deleted successfully`);
-    } else {
-      console.log(`Image ${dltImage} not found`);
-    }
-    res.json({status:true});
-  } catch (error) {
-    console.error('Delete Image Error', error);
-    res.redirect('/admin/pageError');
   }
 }
 
@@ -314,7 +281,6 @@ const getProductDetails = async (req, res) => {
     }
     res.render('adminProduct-details', {product, offerPrice, cateName:category.name, heading: 'Product Details'});
   } catch (error) {
-    console.error('Admin Product Details Error', error);
     res.redirect('/admin/pageError');
   }
 }
@@ -322,7 +288,6 @@ const getProductDetails = async (req, res) => {
 const addVariant = async (req, res) => {
   try {
     const productId = req.body.productId;
-    console.log(req.body);
     const product = await Product.findOne({_id: productId});
     if(!product) {
       return res.status(404).json({success: false, message: 'Product not found'});
@@ -353,7 +318,6 @@ const addVariant = async (req, res) => {
     const variant = {
       color, XS, S, M, L, XL, XXL, XXXL, image
     }
-    console.log(variant);
     const addVariant = await Product.findOneAndUpdate({_id: productId}, {$push: {variant}}, {new: true});
     if(addVariant) {
       return res.status(200).json({success: true, noOfVariant:addVariant.variant.length});
@@ -361,7 +325,6 @@ const addVariant = async (req, res) => {
       return res.status(500).json({success: false, message: 'Failed to add variant'});
     }
   } catch (error) {
-    console.log('product variant add error', error);
     res.status(500).json({success: false, message: 'Internal Server Error'});
   }
 }
@@ -388,7 +351,6 @@ const editVariant = async (req, res) => {
     }
 
   } catch (error) {
-    console.log('product variant edit error', error);
     res.status(500).json({success: false, message: 'Internal Server Error'});
   }
 }
@@ -402,8 +364,6 @@ const editVariantImage = async (req, res) => {
       return res.status(404).json({success: false, message: 'Product not found'});
     }
     const index = req.query.index;
-    console.log(productId, variantId, index);
-    console.log(req.files.length)
     let image;
     if(req.files && req.files.length > 0) {
       const resizedDir = path.join('uploads', 'resized'); 
@@ -421,7 +381,6 @@ const editVariantImage = async (req, res) => {
         image = path.join('resized', req.files[i].filename);
       }
     }
-    console.log(image)
     const updateImage = await Product.findOneAndUpdate({_id: productId, 'variant._id': variantId}, {$set: {[`variant.$.image.${index}`]: image}});
     if(updateImage) {
       return res.status(200).json({success: true, image});
@@ -429,7 +388,6 @@ const editVariantImage = async (req, res) => {
       return res.status(500).json({success: false, message: 'Failed to change image'});
     }
   } catch (error) {
-    console.log('product variant edit image error', error);
     res.status(500).json({success: false, message: 'Internal Server Error'});
   }
 }
@@ -442,7 +400,6 @@ module.exports = {
   unblockProduct,
   getEditProduct,
   editProduct,
-  deleteSingleImage,
   getProductDetails,
   addVariant,
   editVariant,

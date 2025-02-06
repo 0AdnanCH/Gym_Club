@@ -75,7 +75,6 @@ const getCart = async(req, res) => {
       res.render('cart', {cart: null, product});
     }
   } catch (error) {
-    console.error('Get Cart Error' ,error);
     res.redirect('/pageNotFound');
   }
 }
@@ -182,7 +181,6 @@ const addToCart = async(req, res) => {
       res.status(401).json({success: false, redirectUrl:'/login'});
     }
   } catch (error) {
-    console.error('Cart Add Item Error' ,error);
     res.status(500).json({success: false, message: 'Internal server error'});
   }
 }
@@ -238,7 +236,6 @@ const updateQuanity = async (req, res) => {
     }
  
   } catch (error) {
-    console.error('Cart Quantity Update Error' ,error);
     res.status(500).json({success: false, message: 'Internal server error'});
   }
 }
@@ -266,7 +263,6 @@ const removeCartItem = async (req, res) => {
     }
 
   } catch (error) {
-    console.error('Cart Remove Item Error' ,error);
     res.status(500).json({success: false, redirectUrl: 'Internal server error'});
   }
 }

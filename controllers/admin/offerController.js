@@ -10,7 +10,6 @@ const getAddOffer = async (req, res) => {
     const products = await Product.find({isBlocked: false, category:{$in:categories.map(category => category._id)}}, {productName:1});
     res.render('offer-add', {categories, products, heading: 'Offers Add'});
   } catch (error) {
-    console.error('Get Create Offer Error', error);
     res.redirect('/admin/pageError');
   }
 }
@@ -35,7 +34,6 @@ const getOffer = async (req, res) => {
       heading: 'Offers'
     });
   } catch (error) {
-    console.error('Get Offer Error', error);
     res.redirect('/admin/pageError');
   }
 }
@@ -98,7 +96,6 @@ const createOffer = async (req, res) => {
       }
     } 
   } catch (error) {
-    console.error('Create Offer Error', error);
     res.status(500).json({success: false, message: 'Internal Server Error'});
   }
 }
@@ -124,7 +121,6 @@ const changeStatus = async (req, res) => {
       return res.status(404).json({success: false, message: 'offer not Found.'});
     }
   } catch (error) {
-    console.log('Change offer Status Error', error);
     return res.status(500).json({success: false, message: 'Internal Server Error'});
   }
 }

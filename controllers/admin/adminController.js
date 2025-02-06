@@ -77,7 +77,6 @@ const yearChart = async (req, res) => {
     });
     res.status(200).json({ success: true, orderCounts: completeOrderCounts });
   } catch (error) {
-    console.error("Error in yearChart:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -120,7 +119,6 @@ const monthChart = async (req, res) => {
     });    
     res.status(200).json({ success: true, dailyCounts });
   } catch (error) {
-    console.error("Error in monthChart:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -175,7 +173,6 @@ const topProducts = async (req, res) => {
     ]);
     res.status(200).json({ success: true, data: topProducts });
   } catch (error) {
-    console.error("Error fetching top products:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 }
@@ -237,7 +234,6 @@ const topCategoreis = async (req, res) => {
     ]);
     res.status(200).json({ success: true, data: topCategories });
   } catch (error) {
-    console.error("Error fetching top categories:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 }
@@ -275,7 +271,6 @@ const logout = async (req, res) => {
   try {
     req.session.destroy(err => {
       if(err) {
-        console.log('Error destroying session', err);
         return res.status(500).json({success: false, message: 'Failed to logout'})
       }
       res.status(200).json({success: true});
@@ -598,42 +593,9 @@ const reportDownloadPdf = async (req, res) => {
 
     doc.end(); // Finalize the PDF document
   } catch (error) {
-    console.error('Error generating PDF:', error);
     res.status(500).json({message: 'Internal Server Error'});
   }
 };
-const Useres = [
-  { 
-   fname: "Amir", 
-   lname: "Mustafa", 
-   email: "amir@gmail.com", 
-   gender: "Male" 
-  },
-  {
-   fname: "Ashwani",
-   lname: "Kumar",
-   email: "ashwani@gmail.com",
-   gender: "Male",
-  },
-  { 
-   fname: "Nupur", 
-   lname: "Shah", 
-   email: "nupur@gmail.com", 
-   gender: "Female" 
-  },
-  {
-   fname: "Himanshu",
-   lname: "Mewari",
-   email: "himanshu@gmail.com",
-   gender: "Male",
-  },
-  {
-  fname: "Vankayala",
-  lname: "Sirisha",
-  email: "sirisha@gmail.com",
-  gender: "Female",
-  },
-  ];
 
 const reportDownloadExcel = async (req, res) => {
   try {
@@ -723,7 +685,6 @@ const reportDownloadExcel = async (req, res) => {
   await workbook.xlsx.write(res);
   res.status(200).end();
   } catch (error) {
-    console.log(error);
     res.status(500).json({message: 'Internal Server Error'});
   }
 }

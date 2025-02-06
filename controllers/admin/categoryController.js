@@ -38,7 +38,6 @@ const addCategory = async (req, res) => {
     await newCategory.save();
     return res.status(200).json({ success: true});
   } catch (error) {
-    console.log('Add Category Error', error);
     return res.status(500).json({success: false, message: 'Internal Server Error'});
   }
 }
@@ -46,7 +45,6 @@ const loadAddCategory = async (req, res) => {
   try {
     res.render('category-add', {heading: 'Create Category'});
   } catch (error) {
-    console.log('category add load error', error);
     res.redirect('/admin/pageError');
   }
 }
@@ -65,7 +63,6 @@ const changeStatus = async (req, res) => {
       return res.status(200).json({success: true, isListed:false});
     }
   } catch (error) {
-    console.log('Category Unlist Error', error);
     res.status(500).json({success: false, message: 'Internal Server Error.'});
   }
 }
@@ -76,7 +73,6 @@ const getEditCategory = async (req, res) => {
     const category = await Category.findOne({_id: id});
     res.render('category-edit', {category, heading: 'Category Edit'});
   } catch (error) {
-    console.log('Get Category Error', error);
     res.redirect('/admin/pageError');
   }
 }
@@ -100,7 +96,6 @@ const editCategory = async (req, res) => {
       return res.status(200).json({success: false, message: 'Category not found'});
     }
   } catch (error) {
-    console.log('Edit Category Error', error);
     res.status(500).json({error: 'Internal server error'});
   }
 }

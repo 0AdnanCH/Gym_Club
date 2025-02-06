@@ -6,7 +6,6 @@ const getAddCoupon = async (req, res) => {
   try {
     res.render('coupon-add', {heading: 'Coupons Add'});
   } catch (error) {
-    console.log('Get Coupon Add Error', error);
     res.redirect('/admin/pageError');
   }
 }
@@ -25,7 +24,6 @@ const addCoupon = async(req, res) => {
       return res.status(500).json({success: false, message: 'Failed to create coupon'});
     }
   } catch (error) {
-    console.log('Add Coupon Error', error);
     return res.status(500).json({success: false, message: 'Internal server error'});
   }
 }
@@ -43,7 +41,6 @@ const getCoupon = async (req, res) => {
       heading: 'Coupons'
     });
   } catch (error) {
-    console.log('Get Coupon List Error', error);
     res.redirect('/admin/pageError');
   }
 }
@@ -69,7 +66,6 @@ const changeStatus = async (req, res) => {
       return res.status(404).json({success: false, message: 'Coupon not Found.'});
     }
   } catch (error) {
-    console.log('Change coupon Status Error', error);
     return res.status(500).json({success: false, message: 'Internal Server Error'});
   }
 }

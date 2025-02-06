@@ -47,7 +47,6 @@ const getOrder = async (req, res) => {
       heading: 'orders list'
     });
   } catch (error) {
-   console.log('Get Order Error', error);
    res.redirect('/admin/pageError');
   }
 }
@@ -184,7 +183,6 @@ const acceptReturnReq = async (req, res) => {
 
         if(isLastItem < 1) {  
           order = await Order.findOneAndUpdate({_id: returnReq.orderId, "items._id":itemId}, {$set: { payableAmount, "appliedCoupon.discountPrice":discountPrice, "items.$.returnedItem":itemQty, "items.$.isReturned": true}}, {new: true}).populate("appliedCoupon.couponId").exec();
-          // console.log(statusChange)
           let orderStatus = order.items.every(item => item.isCanceled === true || item.isReturned === true);
           if(orderStatus) {
             balance += order.shippingCost;
@@ -224,7 +222,6 @@ const acceptReturnReq = async (req, res) => {
     }
     
   } catch (error) {
-    console.log('Accept Return Error', error);
     res.status(500).json({success: false, message: 'Internal Server Error'});
   }
 }
@@ -262,7 +259,6 @@ const rejectReturn = async (req, res) => {
       return res.status(200).json({success: true});
     }
   } catch (error) {
-    console.log('return reject error', error);
     res.status(500).json({success: false, message: 'Internal Server Error'});
   }
 }

@@ -24,7 +24,6 @@ const customerInfo = async (req, res) => {
     });
 
   } catch (error) {
-    console.log('Customer info Error', error);
     res.redirect('/admin/pageError');
   }
 }
@@ -44,7 +43,6 @@ const customerBlock = async (req, res) => {
       return res.status(200).json({success: true, isBlocked:false});
     }
   } catch (error) {
-    console.log('Customer block Error', error);
     res.status(500).json({success: false, message: 'Internal Server Error'});
   }
 }

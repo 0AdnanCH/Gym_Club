@@ -46,7 +46,6 @@ const stockAvailable = async (req, res) => {
       return res.json({success: true, stock:false});
     }
   } catch (error) {
-    console.error('Product Stock Available Error', error);
     res.status(500).json({success: false, message: 'Internal server error'});
   }
 }

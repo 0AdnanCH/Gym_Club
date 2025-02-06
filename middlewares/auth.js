@@ -15,7 +15,6 @@ const userAuth = async (req, res, next) => {
       next();
     }
   } catch (error) {
-    console.log('Error in userAuth middleware', error);
     res.status(500).json('Internal Server error');
   }
 }
@@ -34,7 +33,6 @@ const adminAuth = async (req, res, next) => {
       res.redirect('/admin/login')
     }
   } catch (error) {
-    console.log('Error in adminauth middleware', error);
     res.status(500).json('Internal Server error');
   }
 }

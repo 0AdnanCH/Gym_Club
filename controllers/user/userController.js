@@ -39,7 +39,6 @@ const loadHomepage = async (req, res) => {
     res.render('home', {product});
     
   } catch (error) {
-    console.log('Failed to load home page', error);
     res.redirect('/errorPage');
   }
 }
@@ -51,7 +50,6 @@ const loadSignup = async (req, res) => {
     }
     return res.render('signup');
   } catch (error) {
-    console.log('Signup page not loading', error);
     res.redirect('/errorPage');
   }
 }
@@ -84,7 +82,6 @@ async function sendVerificationEmail(email, otp) {
     return info.accepted.length > 0
 
   } catch (error) {
-    console.error('Error sending on email', error);
     return false;
   }
 }
@@ -109,10 +106,8 @@ const signup = async (req, res) => {
     req.session.userData = {name, email, password};
 
     res.status(200).json({success: true});
-    console.log('OTP Send', otp);
 
   } catch (error) {
-    console.error('Signup Error', error);
     res.redirect('/pageNotFound');
   }
 }
@@ -124,7 +119,6 @@ const loadOtpPage = async (req, res) => {
       res.redirect('/pageNotFount');
     }
   } catch (error) {
-    console.error('otp load error', error);
     res.redirect('/pageNOtFound');
   }
 }
@@ -141,7 +135,6 @@ const securePassword = async (password) => {
 const verifyOtp = async (req, res) => {
   try {
     const {otp} = req.body;
-    console.log(otp);
     if(otp === req.session.userOtp) {
       const user = req.session.userData;
       const passwordHash = await securePassword(user.password);
@@ -161,7 +154,6 @@ const verifyOtp = async (req, res) => {
       res.status(400).json({success: false, message: 'Invalid OTP, Please try again'});
     }
   } catch (error) {
-    console.error('Error Verifying OTP', error);
     res.status(500).json({success: false, message: 'Internal server error'});
   }
 }
@@ -176,13 +168,11 @@ const resendOtp = async (req, res) => {
     req.session.userOtp = otp;
     const emailSent = await sendVerificationEmail(email, otp);
     if(emailSent) {
-      console.log('Resend OTP:', otp);
       res.status(200).json({success: true, message: 'OTP Resend Successfully'})
     } else {
       res.status(500).json({success: false, message: 'Failed to resend OTP. Please try again'});
     }
   } catch (error) {
-    console.error('Error resending OTP', error)
     res.status(500).json({success: false, message: 'Internal Server Error. Please try again'});
   }
 }
@@ -222,7 +212,6 @@ const login = async (req, res) => {
     req.session.email = email;
     res.status(200).json({success: true});
   } catch (error) {
-    console.error('Login Error', error);
     res.status(500).json({success: false, message: 'login failed. Please try again later'});
   }
 }
@@ -231,13 +220,11 @@ const logout = async (req, res) => {
   try {
     req.session.destroy((err) => {
       if(err) {
-        console.log('Session destructioin error', err.message);
         return res.status(500).json({success: false, message: 'Failed to logout'});
       }
       return res.status(200).json({success: true});
     })
   } catch (error) {
-    console.log('Logout Error', error);
     res.status(500).json({success: false, message: 'Internal server error'});
   }
 }
@@ -322,7 +309,6 @@ const loadShoppingPage = async (req, res) => {
       categories
     })
   } catch (error) {
-    console.log('Load Shopping Page Error', error);
     res.redirect('/pageNotFound');
   }
 }
@@ -400,7 +386,6 @@ const changePassword = async (req, res) => {
       return res.status(500).json({"success":false, "message": "Something went wrong! Please Try again"});
     }
   } catch (error) {
-    console.error('Change Password Error', error);
     res.status(500).json({message: 'Internal server error'});
   }
 }
@@ -433,7 +418,6 @@ const forgotPassword = async (req, res) => {
       req.session.userEmail = email;
   
       res.status(200).json({success: true});
-      console.log('OTP Send', otp);
     }
   } catch (error) {
     res.status(500).json({message: 'Internal server error'});
@@ -442,7 +426,6 @@ const forgotPassword = async (req, res) => {
 const passwordOtpVerify = async (req, res) => {
   try {
     const otp = req.body.otpInput;
-    console.log(otp)
     if(otp === req.session.passwordOtp) {
       req.session.resetpass = true;
       res.status(200).json({success: true, redirectUrl:'/resetPassword'});
@@ -507,72 +490,14 @@ const editresendOtp = async (req, res) => {
     req.session.passwordOtp = otp;
     const emailSent = await sendVerificationEmail(email, otp);
     if(emailSent) {
-      console.log('Resend OTP:', otp);
       res.status(200).json({success: true, message: 'OTP Resend Successfully'})
     } else {
       res.status(500).json({success: false, message: 'Failed to resend OTP. Please try again'});
     }
   } catch (error) {
-    console.error('Error resending OTP', error)
     res.status(500).json({success: false, message: 'Internal Server Error. Please try again'});
   }
 }
-
-// const editEmailOtp = async (req, res) => {
-//   try {
-//     const id = req.query.id;
-//     const email = req.body.email;
-//     console.log(email)
-
-//     const user = await User.findById(id);
-//     if(!user) {
-//       return res.json({success: false, message: 'User not found'});
-//     }
-//     if(user.isBlocked) {
-//       return res.json({success: false, message: 'User is Blocked'});
-//     }
-//     const existEmail = await User.findOne({email, _id:{$ne:id}});    
-//     if(existEmail) {
-//       return res.json({success: false, message: 'User with this email already exists'});
-//     }
-//     const otp = generateOtp();
-//     const emailSent = await sendVerificationEmail(email, otp);
-//     if(!emailSent) {
-//       return res.json('email error');
-//     }
-//     req.session.userEmail = user.email;
-//     req.session.emailOtp = otp;
-//     req.session.updateEmail = email;
-
-//     res.json({success: true});
-//     console.log('OTP Send', otp);
-    
-//   } catch (error) {
-    
-//   }
-// }
-
-// const otpEmailVerify = async (req, res) => {
-//   try {
-//     const otp = req.body.otpInput;
-//     console.log(otp);
-//     if(otp === req.session.emailOtp) {
-//       const userId = req.session.user;
-//       const email = req.session.updateEmail;
-//       const updateEmail = await User.findByIdAndUpdate(userId, {email}, {new: true});
-//       if(updateEmail) {
-//         res.json({success: true, redirectUrl:'/account'});
-//       } else {
-//         res.status(500).json({success: false, message: 'Failed to change email, Please try again'})
-//       }
-     
-//     } else {
-//     res.status(400).json({success: false, message: 'Invalid OTP, Please try again'})
-//   }
-//   } catch (error) {
-    
-//   }
-// }
 
 const editName = async (req, res) => {
   try {

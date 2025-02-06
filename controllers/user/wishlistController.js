@@ -61,7 +61,6 @@ const getWishlist = async (req, res) => {
       res.render('wishlist', {wishlist, product});
     }
   } catch (error) {
-    console.error('Get Wishlish Error', error);
     res.redirect('/pageNotFound');
   }
 }
@@ -134,7 +133,6 @@ const addtoWishlist = async (req, res) => {
     await newItem.save();
     return res.status(200).json({success: true, itemQty:newItem.items.length});
   } catch (error) {
-    console.error('Add to Wishlish Error', error);
     res.status(500).json({success: false, message:'Internal server error'});
   }
 }
@@ -155,7 +153,6 @@ const removeItem = async (req, res) => {
       return res.status(500).json({success: false, message: 'Failed to remove item'});
     }
   } catch (error) {
-    console.error('Remove wishlist item error', error);
     res.status(500).json({success: false, message:'Internal server error'});
   }
 }

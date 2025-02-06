@@ -250,7 +250,6 @@ const codpayment = async (req, res) => {
     }
 
   } catch (error) {
-    console.error('COD delivery error', error);
     return res.status(500).json({success:false, message: 'Internal server error'});
   }
 }
@@ -761,7 +760,6 @@ const createOrder = async (req, res) => {
       return res.status(500).json({success: false, message: 'Something went wrong, Failed to place order'});
     }
   } catch (error) {
-    console.log('Razorpay create order Error', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 }
@@ -798,10 +796,7 @@ const verifyPayment = async (req, res) => {
 
 const paymentFailed = async (req, res) => {
   try {
-    console.log('this is from payment failed')
     const { message } = req.body; // Razorpay webhook sends payload
-    // Log the failed payment details
-    console.error('Payment failed:', message);
     return res.status(200).json({success: true, message: 'Payment Failed, retry'});
   } catch (error) {
     res.status(500).json({success: false, message: 'Internal server error'});
@@ -810,7 +805,6 @@ const paymentFailed = async (req, res) => {
 
 const handleWebhook = async (req, res) => {
   try {
-    console.log('dkfdkfjkdfjdkjk')
     const { event, payload } = req.body;
     if(event === 'payment.failed') {
      await Order.updateOne({razorpayOrderId: payload.payment.entity.order_id, paymentStatus: {$ne: 'Failed'}}, {$set: {paymentStatus: 'Failed'}}); 
@@ -901,7 +895,6 @@ const applyCoupon = async (req, res) => {
       }
 
   } catch (error) {
-    console.log('Apply coupon error', error);
     res.status(500).json({success: false, message: 'Internal server error'});
   }
 }
@@ -919,7 +912,6 @@ const removeCoupon = async (req, res) => {
       return res.status(500).json({success:false, message: 'Failed to remove coupon'});
     }
   } catch (error) {
-    console.log('Remove coupon error', error);
     res.status(500).json({success: false, message: 'Remove coupon error'});
   }
 }
@@ -1099,7 +1091,6 @@ const returnOrders = async (req, res) => {
 const cancelReturn = async (req, res) => {
   try {
     const orderId = req.query.id;
-    console.log(orderId)
     if(!orderId) {
       return res.status(401).json({success: false, message: 'Invalid credential'});
     }
@@ -1130,7 +1121,6 @@ const indiReturnConfrim = async (req, res) => {
     }
     let isAllItem;
     let selectedItem = order.items.find(item => item._id.equals(new ObjectId(itemId)));
-    console.log(orderId, itemId, quantity, reasons)
     const existOrder = await ordReturn.findOne({orderId, status: 'Pending'});
     if(existOrder) {
       const existItem = existOrder.items.find(item => item.itemId.equals(new ObjectId(itemId)));
@@ -1303,21 +1293,18 @@ const downloadInvoice = async (req, res) => {
     // Finalize the PDF document
     doc.end();
   } catch (error) {
-    console.error('Error generating invoice PDF:', error);
     res.status(500).json({success: false, message: 'Internal server error'});
   }
 };
 
 const continueRazorpay = async (req, res) => {
   try {
-    console.log('im in continue payment')
     const orderId = req.query.orderId;
     if(!orderId) {
       return res.status(401).json({success: false, message: 'Invalid credential'});
     }
     const userId = req.session.user;
     const order = await Order.findOne({_id: orderId, userId, paymentMethod: 'razorpay', paymentStatus: {$in: ['Pending', 'Failed']}});
-    console.log(order)
     if(order) {
       return res.status(200).json({success: true, razorpayOrderId:order.razorpayOrderId, amount: order.payableAmount * 100, currency: 'INR', razorpayId: razorpay.key_id, orderId: order._id});
     } else {
@@ -1337,7 +1324,6 @@ const paymentStatus = async (req, res) => {
     const userId = req.session.user;
     const paymentStatus = await Order.findOne({_id: orderId}, {_id:0, paymentStatus:1}); 
     if(paymentStatus) {
-      console.log(paymentStatus)
       res.status(200).json({success: true, paymentStatus: paymentStatus.paymentStatus});
     } else {
       res.status(404).json({success: false, message: 'Order not found'});

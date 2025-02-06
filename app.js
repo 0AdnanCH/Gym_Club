@@ -42,9 +42,6 @@ app.use('/admin', adminRouter);
 app.use(errorHandlerMiddleware.pageNotFound);
 app.use(errorHandlerMiddleware.errorHandler);
 
-app.listen(process.env.PORT,()=> {
-  console.log(`server running at http://localhost:${process.env.PORT}`);
-});
-
+app.listen(process.env.PORT);
 
 module.exports = app;
