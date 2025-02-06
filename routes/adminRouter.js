@@ -72,16 +72,16 @@ router.put('/editCategory/:id', auth.adminAuth, categoryController.editCategory)
 
 //product management
 router.get('/addProducts', auth.adminAuth, productController.getAddProduct);
-router.post('/addProducts', auth.adminAuth,productController.addProduct);
+router.post('/addProducts', auth.adminAuth, productController.addProduct);
 router.get('/products', auth.adminAuth, productController.getAllProducts);
 router.patch('/blockProduct', auth.adminAuth, productController.blockProduct);
 router.patch('/unblockProduct', auth.adminAuth, productController.unblockProduct);
 router.get('/editProduct', auth.adminAuth, productController.getEditProduct);
 router.put('/editProduct/:id', auth.adminAuth, productController.editProduct);
 router.get('/productDetails', auth.adminAuth, productController.getProductDetails);
-router.patch('/product/addVariant', auth.adminAuth, upload.array('images', 10), productController.addVariant);
+router.patch('/product/addVariant', auth.adminAuth, upload.array('images', 3), productController.addVariant);
 router.patch('/product/editVariant', auth.adminAuth, productController.editVariant);
-router.patch('/product/editImage', auth.adminAuth, upload.array('images', 10), productController.editVariantImage);
+router.patch('/product/editImage', auth.adminAuth, upload.array('images', 3), productController.editVariantImage);
 
 //order management
 router.get('/order', auth.adminAuth, orderController.getOrder);

@@ -19,8 +19,7 @@ const getAddProduct = async (req, res) => {
 const addProduct = async (req, res) => {
   try {
     const product = req.body;
-    console.log(product)
-    const productExists = await Product.findOne({productName: new RegExp(`^${product.productName}$`, 'i')});
+    const productExists = await Product.findOne({productName: new RegExp(`^${product.name}$`, 'i')});
     if(!productExists) {
       const categoryId = await Category.findOne({name: product.category, isListed: true});
       if(!categoryId) {
@@ -28,10 +27,10 @@ const addProduct = async (req, res) => {
       }
 
       const newProduct = new Product({
-        productName: product.productName,
+        productName: product.name,
         description: product.description,
         category: categoryId._id,
-        regularPrice: product.regularPrice,
+        regularPrice: product.price,
         salePrice: product.salePrice,
         status: 'Available',
       });
@@ -123,7 +122,7 @@ const editProduct = async (req, res) => {
     const data = req.body;
 
     const existingProduct = await Product.findOne({
-      productName: new RegExp(`^${data.productName}$`, 'i'),
+      productName: new RegExp(`^${data.name}$`, 'i'),
       _id:{$ne: id}
     })
     if(existingProduct) {
@@ -135,14 +134,14 @@ const editProduct = async (req, res) => {
     }
 
     const updateFields = {
-      productName: data.productName,
+      productName: data.name,
       description: data.description,
       category: categoryId._id,
-      regularPrice: data.regularPrice,
+      regularPrice: data.price,
       salePrice: data.salePrice,
     }
 
-    await Product.findByIdAndUpdate(id,updateFields, {new:true});
+    await Product.findOneAndUpdate({_id: id}, {$set: updateFields}, {new:true});
     res.status(200).json({success: true});
   } catch (error) {
     console.error('Edit Product Error', error);

@@ -290,7 +290,13 @@
                     showError('salePrice-error', 'Please enter a valid non-negative price.');
                }
         
-               return isValid;
+               if(isValid) {
+                    return {
+                         name, description, category, price, salePrice
+                    }
+               } else {
+                    return false;
+               }
           }
 
           function clearErrorMessage() {
@@ -304,14 +310,16 @@
           async function validateAndSubmit(event) {
                event.preventDefault();
                try {
-                    if(!validateForm()) {
+                    const formData = validateForm();
+                    if(!formData) {
                          return;
                     }
-                    const productForm = document.getElementById('product-form');
-                    const formData = new FormData(productForm);
                     const response = await fetch('/admin/editProduct/<%= product._id %>', {
                          method:'PUT',
-                         body: formData
+                         headers: {
+                              'content-type': 'application/json'
+                         },
+                         body: JSON.stringify(formData)
                     });
                     const data = await response.json();
                     if (!response.ok) {

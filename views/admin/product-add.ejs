@@ -143,7 +143,7 @@
                                              All Products
                                         </a>
                                    </div>
-                                   <form id="product-form">
+                                   <form id="product-form" enctype="multipart/form-data">
                                         <div class="card-body">
                                              <div class="row">
                                                   <div class="col-lg-6">
@@ -282,7 +282,13 @@
                     isValid = false;
                     showError('salePrice-error', 'Please enter a valid non-negative price.');
                }
-               return isValid;
+               if(isValid) {
+                    return {
+                         name, description, category, price, salePrice
+                    }
+               } else {
+                    return false;
+               }
           }
 
           document.getElementById('cancel-btn').addEventListener('click', () => {
@@ -300,14 +306,16 @@
           async function validateAndSubmit(event) {
                event.preventDefault();
                try {
-                    if(!validateForm()) {
+                    const formData = validateForm()
+                    if(!formData) {
                          return;
                     }
-                    const productForm = document.getElementById('product-form');
-                    const formData = new FormData(productForm);
                     const response = await fetch('/admin/addProducts', {
                          method:'POST',
-                         body: formData
+                         headers: {
+                              'content-type': 'application/json'
+                         },
+                         body: JSON.stringify(formData)
                     });
                     const data = await response.json();
                     if (!response.ok) {
