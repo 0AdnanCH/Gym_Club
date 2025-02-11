@@ -102,7 +102,7 @@
                                         </td>
                                         <td class="cart__table--body__list text-right">
                                             <% if( wishlist[i].available) { %>
-                                              <button class="wishlist__cart--btn primary__btn" type="button" onclick="return addtoCart(event, '<%= wishlist[i].productId._id %>', '<%= wishlist[i].color %>', '<%= wishlist[i].size %>')">Add To Cart</button>
+                                              <button class="wishlist__cart--btn primary__btn" type="button" onclick="return addtoCart(event, '<%= wishlist[i].productId._id %>', '<%= wishlist[i].color %>', '<%= wishlist[i].size %>', '<%= wishlist[i]._id %>', '<%= i %>')">Add To Cart</button>
                                             <% } else { %>
                                               <button class="wishlist__cart--btn primary__btn addtocart-btn" type="button">Add To Cart</button>
                                             <% } %>
@@ -258,10 +258,10 @@
   <script src="js/script.js"></script>
   <script>
     // for removing items for wishlist
-    async function removeItems(event, id, i) {
+    async function removeItems(event, itemId, i, isMessage = true) {
       event.preventDefault();
       try {
-        const response = await fetch('/removeWishlitItem?id='+id, {method: 'DELETE'});
+        const response = await fetch('/removeWishlitItem?id='+itemId, {method: 'DELETE'});
         const data = await response.json();
         if(!response.ok) {
             if(data.redirectUrl) {
@@ -270,18 +270,20 @@
             throw new Error(data.message);
         }
         if(data.success) {
-            Swal.fire({
-            position: "top-end",
-            icon: 'success',
-            title: 'Product removed successfully',
-            showConfirmButton: false,
-            timer: 1500,
-            customClass: {
-                popup: 'custom-swal-popup'
+            if(isMessage) {
+                Swal.fire({
+                    position: "top-end",
+                    icon: 'success',
+                    title: 'Product removed successfully',
+                    showConfirmButton: false,
+                    timer: 1500,
+                    customClass: {
+                        popup: 'custom-swal-popup'
+                    }
+                })
             }
-          })
-          document.getElementById('item-cont'+i).style.display = 'none';
-          document.querySelectorAll('.wishlist-qty').forEach(elem => elem.innerHTML = data.itemQty);
+            document.getElementById('item-cont'+i).style.display = 'none';
+            document.querySelectorAll('.wishlist-qty').forEach(elem => elem.innerHTML = data.itemQty);
         }
       } catch (error) {
         Swal.fire({
@@ -298,10 +300,10 @@
       }
     }
     // for add to cart 
-    async function addtoCart(event, id, color, size) {
+    async function addtoCart(event, productId, color, size, itemId, index) {
       event.preventDefault();
       try {
-        const response = await fetch(`/addToCart?id=${id}`, {
+        const response = await fetch(`/addToCart?id=${productId}`, {
             method: 'POST',
             headers: {
             'content-type': 'application/json'
@@ -327,9 +329,10 @@
                 }
             })
             .then(() => {
+                removeItems(event, itemId, index, false)
                 document.querySelectorAll('.cart-qty').forEach(element => {
                     element.innerHTML = data.itemQty;
-                })
+                });
             })
         }
       } catch (error) {

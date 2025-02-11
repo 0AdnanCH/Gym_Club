@@ -32,12 +32,14 @@ const getCheckout = async (req, res) => {
     if(!cart) {
       return res.redirect('/shop');
     }
+    const wallet = await Wallet.findOne({userId});
+    let balance = wallet ? wallet.balance : 0;
     let coupon = req.session.coupon;
     if(coupon) {
       coupon = coupon.subtotal !== cart.totalAmount ? null : coupon;
     }
     const userAddress = await Address.find({userId , isBlocked: false});
-    res.render('checkout', {userId, userAddress, cart, coupon});
+    res.render('checkout', {userId, userAddress, cart, coupon, balance});
   } catch (error) {
     res.redirect('/pageNotFound');
   }
@@ -524,19 +526,21 @@ const cancelOrder = async (req, res) => {
     if(order.orderStatus === 'Delivered' || order.orderStatus === 'Canceled' || order.orderStatus === 'Returned') {
       return res.status(400).json({success: false, message: `Order is ${order.orderStatus}, Order cancel Failed`});
     }
-    const products = await Product.find({isBlocked: false});
-    if(!products) {
-      return res.status(404).json({success: false, message: 'Product not found, Order cancel Failed'});
-    }
-    for(const item of order.items) {
-      const existProduct = products.find((product) => product._id.equals(item.productId));
-      if(existProduct) {
-        const productVariant =  existProduct.variant.find((variant) => variant.color === item.color)
-        if(productVariant) {
-          const newStock = productVariant[item.size] + item.quantity;
-          productVariant[item.size] = newStock;
+    if(order.paymentMethod === 'cod' || order.paymentMethod === 'wallet' || order.paymentMethod === 'razorpay' && order.paymentStatus === 'Paid') {
+      const products = await Product.find({isBlocked: false});
+      if(!products) {
+        return res.status(404).json({success: false, message: 'Product not found, Order cancel Failed'});
+      }
+      for(const item of order.items) {
+        const existProduct = products.find((product) => product._id.equals(item.productId));
+        if(existProduct) {
+          const productVariant =  existProduct.variant.find((variant) => variant.color === item.color)
+          if(productVariant) {
+            const newStock = productVariant[item.size] + item.quantity;
+            productVariant[item.size] = newStock;
+          }
+          await existProduct.save();
         }
-        await existProduct.save();
       }
     }
     if(order.paymentStatus === 'Paid') {
@@ -607,7 +611,7 @@ const createOrder = async (req, res) => {
     if(!userAddress) {
       return res.status(404).json({success: false ,message: 'shipping address not found, Order Failed.'});
     }
-
+    
     const products = await Product.find({isBlocked: false});
     if(!products) {
       return res.status(404).json({success: false ,message: 'Product not found, Order Failed.'});
@@ -623,13 +627,9 @@ const createOrder = async (req, res) => {
             }
             return res.status(400).json({success: false, message: `${existProduct.productName} only ${productVariant[item.size]} available, order Failed`});
           }
-          const newStock = productVariant[item.size] - item.quantity;
-          productVariant[item.size] = newStock;
         }
-        await existProduct.save();
       }
     }
-
     const address = {
       name: userAddress.name,
       phone: userAddress.phone,
@@ -780,6 +780,31 @@ const verifyPayment = async (req, res) => {
   try {
     const isValidSignature = validateWebhookSignature(body, razorpay_signature, secret);
     if(isValidSignature) {
+    const order = await Order.findOne({_id: orderId, userId});
+    if(!order) {
+      return res.status(404).json({success: false ,message: 'Order not found, Order verification Failed.'});
+    }
+    const products = await Product.find({isBlocked: false});
+    if(!products) {
+      return res.status(404).json({success: false ,message: 'Product not found, Order verification Failed.'});
+    }
+    for(const item of order.items) {
+      const existProduct = products.find((product) => product._id.equals(item.productId));
+      if(existProduct) {
+        const productVariant =  existProduct.variant.find((variant) => variant.color === item.color)
+        if(productVariant) {
+          if(productVariant[item.size] < item.quantity) {
+            if(productVariant[item.size] === 0) {
+              return res.status(400).json({success: false, message: `${existProduct.productName} out of stock, order Failed`});
+            }
+            return res.status(400).json({success: false, message: `${existProduct.productName} only ${productVariant[item.size]} available, order Failed`});
+          }
+          const newStock = productVariant[item.size] - item.quantity;
+          productVariant[item.size] = newStock;
+        }
+        await existProduct.save();
+      }
+    }
      const verifyPayment = await Order.findOneAndUpdate({_id: orderId, userId}, {$set: {paymentStatus: 'Paid'}}, {new: true})
      if(verifyPayment) {
       return res.status(200).json({success: true});
@@ -954,19 +979,26 @@ const changeItemStatus = async (req, res) => {
       if(totalwithoutCancelProduct>= order.appliedCoupon.couponId.minCartValue) {
         const disCanceleditem = selectedItem.price * (order.appliedCoupon.discountPrice/totalwithoutCoupon); 
         discountPrice = order.appliedCoupon.discountPrice - (disCanceleditem * quantity);
-        payableAmount = (order.payableAmount - order.shippingCost) - ((selectedItem.price * quantity) - (disCanceleditem * quantity))
-        balance = (order.payableAmount - order.shippingCost) - payableAmount;
+        discountPrice = Number(discountPrice.toFixed(2));
+        payableAmount = ((order.payableAmount - order.shippingCost) - ((selectedItem.price * quantity) - (disCanceleditem * quantity))).toFixed(2);
+        payableAmount = Number(payableAmount);
+        balance = ((order.payableAmount - order.shippingCost) - payableAmount).toFixed(2);
+        balance = Number(balance);
       } else {
         // if not
-        payableAmount = totalwithoutCancelProduct;
-        balance = (order.payableAmount - order.shippingCost ) - payableAmount;
+        payableAmount = totalwithoutCancelProduct.toFixed(2);;
+        payableAmount = Number(payableAmount);
+        balance = ((order.payableAmount - order.shippingCost ) - payableAmount).toFixed(2);
+        balance = Number(balance);
         discountPrice = 0;
       }
       payableAmount+=order.shippingCost;
     } else {
       // if not coupon exist
-      payableAmount = order.payableAmount - (selectedItem.price * quantity);
-      balance = order.payableAmount - payableAmount;
+      payableAmount = (order.payableAmount - (selectedItem.price * quantity)).toFixed(2);
+      payableAmount = Number(payableAmount);
+      balance = (order.payableAmount - payableAmount).toFixed(2);
+      balance = Number(balance);
     }
 
     let value = 'Canceled'
@@ -995,6 +1027,7 @@ const changeItemStatus = async (req, res) => {
     } else {
       statusChange = await Order.findOneAndUpdate({_id: orderId, "items._id":itemId}, {$set: { payableAmount, "appliedCoupon.discountPrice":discountPrice, "items.$.canceledItems":itemQty}}, {new: true});
     }
+       console.log(balance)
     if(order.paymentStatus === 'Paid') {
       const wallet = await Wallet.findOne({userId, isActive:true});
       const transaction = {
@@ -1013,22 +1046,22 @@ const changeItemStatus = async (req, res) => {
         await newWallet.save();
       }
     }
-   
-    const product = await Product.findOne({_id: selectedItem.productId, isBlocked:false});
-    const variant = product.variant.find(variant => variant.color === selectedItem.color);
-    if(variant) {
-      const newStock = variant[selectedItem.size] + quantity;
-      variant[selectedItem.size] = newStock;
-     }
-     await product.save();
-     payableAmount = Math.round(payableAmount)
-
+    if(order.paymentMethod === 'cod' || order.paymentMethod === 'wallet' || order.paymentMethod === 'razorpay' && order.paymentStatus === 'Paid') {
+      const product = await Product.findOne({_id: selectedItem.productId, isBlocked:false});
+      const variant = product.variant.find(variant => variant.color === selectedItem.color);
+      if(variant) {
+        const newStock = variant[selectedItem.size] + quantity;
+        variant[selectedItem.size] = newStock;
+      }
+      await product.save();
+    }
      if(isLastItem < 1) {
       return res.status(200).json({success: true, payableAmount, firstCancel, itemQty, isCanceled: true});
      } else {
       return res.status(200).json({success: true, payableAmount, itemQty, firstCancel, remainQty:selectedItem.quantity - itemQty});
      }
   } catch (error) {
+    console.log(error)
     res.status(500).json({message: 'Internal server error'});
   }
 }
@@ -1231,6 +1264,10 @@ const downloadInvoice = async (req, res) => {
     }
     doc.text(`Payment Status: ${order.paymentStatus}`);
     doc.text(`Order Status: ${order.orderStatus}`);
+    doc.text(`Shipping address: 
+      Phone number: ${order.address.phone}
+      ${order.address.locality}, ${order.address.address}
+      ${order.address.place}, ${order.address.state} - ${order.address.pincode}`);
     doc.moveDown(2); // Add space before items table
 
     // Table Header
@@ -1243,7 +1280,7 @@ const downloadInvoice = async (req, res) => {
       { label: "Total Price", width: 80 },
     ];
 
-    const headerTopMargin = 10; // Margin above header
+    const headerTopMargin = 50; // Margin above header
     const headerY = tableTop + headerTopMargin; // Calculate the y position for headers
 
     // Draw table headers
@@ -1305,11 +1342,28 @@ const continueRazorpay = async (req, res) => {
     }
     const userId = req.session.user;
     const order = await Order.findOne({_id: orderId, userId, paymentMethod: 'razorpay', paymentStatus: {$in: ['Pending', 'Failed']}});
-    if(order) {
-      return res.status(200).json({success: true, razorpayOrderId:order.razorpayOrderId, amount: order.payableAmount * 100, currency: 'INR', razorpayId: razorpay.key_id, orderId: order._id});
-    } else {
+    if(!order) {
       return res.status(404).json({success: false, message: 'Order not found'});
     }
+    const products = await Product.find({isBlocked: false});
+    if(!products) {
+      return res.status(404).json({success: false ,message: 'Product not found, Payment Failed.'});
+    }
+    for(const item of order.items) {
+      const existProduct = products.find((product) => product._id.equals(item.productId));
+      if(existProduct) {
+        const productVariant =  existProduct.variant.find((variant) => variant.color === item.color)
+        if(productVariant) {
+          if(productVariant[item.size] < item.quantity) {
+            if(productVariant[item.size] === 0) {
+              return res.status(400).json({success: false, message: `${existProduct.productName} out of stock, Payment Failed`});
+            }
+            return res.status(400).json({success: false, message: `${existProduct.productName} only ${productVariant[item.size]} available, Payment Failed`});
+          }
+        }
+      }
+    }
+    res.status(200).json({success: true, razorpayOrderId:order.razorpayOrderId, amount: order.payableAmount * 100, currency: 'INR', razorpayId: razorpay.key_id, orderId: order._id});
   } catch (error) {
     res.status(500).json({success: false, message: 'Internal server error'});
   }

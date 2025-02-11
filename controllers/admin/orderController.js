@@ -162,19 +162,25 @@ const acceptReturnReq = async (req, res) => {
           if(totalwithoutReturnProduct>= order.appliedCoupon.couponId.minCartValue) {
             const disReturnitem = selectedItem.price * (order.appliedCoupon.discountPrice/totalwithoutCoupon); 
             discountPrice = order.appliedCoupon.discountPrice - (disReturnitem * quantity);
+            discountPrice = Number(discountPrice.toFixed(2));
             payableAmount = (order.payableAmount - order.shippingCost) - ((selectedItem.price * quantity) - (disReturnitem * quantity))
+            payableAmount = Number(payableAmount.toFixed(2));
             balance = (order.payableAmount - order.shippingCost) - payableAmount;
+            balance = Number(balance.toFixed(2));
           } else {
             // if not
-            payableAmount = totalwithoutReturnProduct;
+            payableAmount = Number(totalwithoutReturnProduct.toFixed(2));
             balance = (order.payableAmount - order.shippingCost) - payableAmount;
+            balance = Number(balance.toFixed(2));
             discountPrice = 0;
           }
           payableAmount += order.shippingCost;
         } else {
           // if not coupon exist
           payableAmount = order.payableAmount - (selectedItem.price * quantity);
+          payableAmount = Number(payableAmount.toFixed(2));
           balance = order.payableAmount - payableAmount;
+          balance = Number(balance.toFixed(2));
         }
 
         payableAmount = payableAmount < 1 ? 0 : payableAmount;

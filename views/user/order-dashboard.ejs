@@ -26,6 +26,22 @@
         border: none;
         padding: 0;
     }
+    .pagination .page-link {
+        color: gray;
+        background-color: white;
+        border: 1px solid grey;
+    }
+
+    .pagination .page-link:hover {
+        background-color: black;
+        color: white;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: gray;
+        border-color: gray;
+        color: white;
+    }
   </style>
 </head>
 
@@ -127,18 +143,34 @@
                                 </table>
                             </div>
                             <div class="pagination__area bg__gray--color">
-                                <nav class="pagination justify-content-center">
-                                    <div class="pagination-conatiner">
-                                        <% if(currentPage > 1) { %>
-                                        <a href="?page=<%= currentPage - 1 %>">&laquo; Previous</a>
-                                        <% } %> <% for(let i = 1; i<= totalPages; i++) { %> <% if(i === currentPage) { %>
-                                        <span class="current-page"><%= i %></span>
-                                        <% } else { %>
-                                        <a href="?page=<%= i %>"><%= i %></a>
-                                        <% } %> <% } %> <% if(currentPage < totalPages) { %>
-                                        <a href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
+                                <nav aria-label="Page navigation example">
+                                    <ul class="pagination justify-content-end">
+                                    <% if(currentPage === 1) { %>
+                                      <li class="page-item disabled">
+                                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                                      </li>
+                                      <% } else { %>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=<%= currentPage - 1 %>" tabindex="-1" >Previous</a>
+                                          </li>
+                                        <% } %>
+                                        <% for(let i = 1; i<= totalPages; i++) { %>
+                                            <% if(i === currentPage) { %>
+                                                <li class="page-item active"><a class="page-link" href="#"><%= i %></a></li>
+                                            <% } else { %>
+                                                <li class="page-item"><a class="page-link" href="?page=<%= i %>"><%= i %></a></li>
+                                            <% } %>
+                                        <% } %>
+                                        <% if(currentPage === totalPages) { %>
+                                            <li class="page-item disabled" tabindex="-1" aria-disabled="true">
+                                                <a class="page-link" href="#">Next</a>
+                                            </li>
+                                        <% } else { %> 
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page=<%= currentPage + 1 %>">Next</a>
+                                            </li>
                                         <% } %>  
-                                    </div>
+                                    </ul>
                                 </nav>
                             </div>
                         </div>
