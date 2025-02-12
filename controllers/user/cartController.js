@@ -89,7 +89,7 @@ const addToCart = async(req, res) => {
    
     if(userId) {
       const product = await Product.findOne({_id:productId, isBlocked:false})
-      .populate('offerApplied', 'discountVal discountType maxDiscount')
+      .populate('offerApplied')
       .exec();
       if(!product) {
         return res.status(404).json({success: false, message: 'Product is not available'});
@@ -115,13 +115,10 @@ const addToCart = async(req, res) => {
       } 
       const variant = product.variant.find(item => item.color === color);
       const image = variant?.image[0];
-        let price;     
-
-          // const cate = category.find(cat => cat._id.equals(product.category));
+        let price;
           if(product.offerApplied || category.offerApplied) {
             product.offerApplied = await allProductOffer(product.offerApplied, category.offerApplied, product.salePrice);
           }
-      
         if(product.offerApplied) {
           if(product.offerApplied.discountType === 'percentage') {
             let disValue = product.offerApplied.discountVal;
@@ -141,7 +138,6 @@ const addToCart = async(req, res) => {
         } else {
           price = product.salePrice;
         }
-
         const totalPrice = price * quantity;
         let cart = await Cart.findOne({userId});
         if(cart) {
