@@ -70,6 +70,13 @@ const changeOrderStatus = async (req, res) => {
     if(!orderId) {
       return res.status(404).json({success: false, message: 'Order id not found'});
     }
+    const order = await Order.findOne({_id: orderId});
+    if(!order) {
+      return res.status(404).json({success: false, message: 'Order not found'});
+    } 
+    if(order.orderStatus === 'Canceled' || order.orderStatus === 'Delivered') {
+      return res.status(400).json({success: false, message: `Cannot change status, Order already ${order.orderStatus}`});
+    }
     let paymentStatus;
     if(orderStatus === 'Pending') {
       paymentStatus = 'Pending';
@@ -81,6 +88,61 @@ const changeOrderStatus = async (req, res) => {
       paymentStatus = 'Paid';
     }  else if(orderStatus === 'Canceled') {
       paymentStatus = 'Canceled';
+    }
+    const products = await Product.find({isBlocked: false});
+    if(!products) {
+      return res.status(404).json({success: false, message: 'Product not found, Order cancel Failed'});
+    }
+    if(orderStatus === 'Canceled' && order.paymentMethod === 'cod' || orderStatus === 'Canceled' && order.paymentMethod === 'wallet' || orderStatus === 'Canceled' && order.paymentMethod === 'razorpay' && order.paymentStatus === 'Paid') {
+      for(const item of order.items) {
+        const existProduct = products.find((product) => product._id.equals(item.productId));
+        if(existProduct) {
+          const productVariant =  existProduct.variant.find((variant) => variant.color === item.color)
+          if(productVariant) {
+            const newStock = productVariant[item.size] + item.quantity;
+            productVariant[item.size] = newStock;
+          }
+          await existProduct.save();
+        }
+      }
+    }
+    if(orderStatus === 'Delivered' && order.paymentMethod === 'razorpay' && order.paymentStatus !== 'Paid') {
+      for(const item of order.items) {
+        const existProduct = products.find((product) => product._id.equals(item.productId));
+        if(existProduct) {
+          const productVariant =  existProduct.variant.find((variant) => variant.color === item.color)
+          if(productVariant) {
+            if(productVariant[item.size] < item.quantity) {
+              if(productVariant[item.size] === 0) {
+                return res.status(400).json({success: false, message: `${existProduct.productName} out of stock, order Failed`});
+              }
+              return res.status(400).json({success: false, message: `${existProduct.productName} only ${productVariant[item.size]} available, order Failed`});
+            }
+            const newStock = productVariant[item.size] - item.quantity;
+            productVariant[item.size] = newStock;
+          }
+          await existProduct.save();
+        }
+      }
+    }
+    if(orderStatus === 'Canceled' && order.paymentStatus === 'Paid') {
+      const wallet = await Wallet.findOne({userId: order.userId, isActive:true});
+      let balance = order.payableAmount;
+      const transaction = {
+        transactionType: 'refund',
+        amount: order.payableAmount
+      }
+      if(wallet) {
+        balance += wallet.balance;
+        await Wallet.updateOne({userId: order.userId, isActive:true}, {$set:{balance}, $push: {transaction}});
+      } else {
+        const newWallet = new Wallet({
+          userId: order.userId,
+          balance,
+          transaction
+        })
+        await newWallet.save();
+      }
     }
     const updateStatus = await Order.findOneAndUpdate({_id: orderId}, {$set: {orderStatus, paymentStatus}}, {new:true});
     if(updateStatus) {

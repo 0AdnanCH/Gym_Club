@@ -107,11 +107,11 @@ const orderSchema = new Schema({
       },
       returnedItem: {
         type: Number,
-        required: false
+        default: 0
       },
       canceledItems: {
         type: Number,
-        required:false
+        default: 0
       }
     },
   ],

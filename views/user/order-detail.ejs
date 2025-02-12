@@ -127,7 +127,7 @@
                             <button onclick="invoicePDFDoc(event, '<%= order._id %>')" class="btn btn-primary">
                                 download invoice
                             </button>
-                            <% if(order.paymentMethod === 'razorpay' && (order.paymentStatus === 'Pending' || order.paymentStatus === 'Failed')) { %>
+                            <% if(order.orderStatus !== 'Canceled' && order.paymentMethod === 'razorpay' && (order.paymentStatus === 'Pending' || order.paymentStatus === 'Failed')) { %>
                             <button class="btn btn-success" id="razorpay-pay-btn">
                                 Continue Pay
                             </button>
@@ -478,6 +478,23 @@
         async function orderCancellation(event) {
             event.preventDefault();
             try {
+                const result = await Swal.fire({
+                    position: "top-end",
+                    title: 'Are you sure you want to Cancel this Order?',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No',
+                    customClass: {
+                        popup: 'short-swal-popup',
+                        confirmButton: 'short-swal-confirm-btn',
+                        cancelButton: 'short-swal-cancel-btn'
+                    }
+                })
+                if(!result.isConfirmed) {
+                    return;
+                }
                 const response = await fetch(`/cancelOrder?id=<%= order._id %>`, { method: 'PATCH' });
                 const data = await response.json();
                 if(!response.ok) {
@@ -502,6 +519,10 @@
                     document.querySelectorAll('.item-indi-cancel').forEach(element => {
                         element.style.display = 'none'
                     })
+                    const razorpayPayBtn = document.getElementById('razorpay-pay-btn');
+                    if(razorpayPayBtn) {
+                        razorpayPayBtn.style.display = 'none';
+                    }
                 }
             } catch (error) {
                 Swal.fire({
@@ -561,6 +582,23 @@
                 });
                 return;
             }
+            const result = await Swal.fire({
+                    position: "top-end",
+                    title: 'Are you sure you want to Cancel this product?',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No',
+                    customClass: {
+                        popup: 'short-swal-popup',
+                        confirmButton: 'short-swal-confirm-btn',
+                        cancelButton: 'short-swal-cancel-btn'
+                    }
+            })
+            if(!result.isConfirmed) {
+                return;
+            }
             const response = await fetch(`/changeItemstatus?orderId=<%= order._id %>&itemId=${itemId}`, {
                 method: 'PATCH',
                 headers: {
@@ -598,13 +636,19 @@
                 }
                 document.getElementById('item-status'+i).classList.remove('d-none');
                 document.getElementById('total-amount').innerHTML = data.payableAmount;
-                document.getElementById('payment-status').innerHTML = 'Canceled';
-                document.getElementById('order-status').innerHTML = 'Canceled';
-                document.getElementById('cancel-btn').style.display = 'none';
+                document.getElementById('cancel-no'+i).innerHTML = data.itemQty;
                 if(data.firstCancel) {
                     document.getElementById('item-status'+i).classList.remove('d-none');
                 }
-                document.getElementById('cancel-no'+i).innerHTML = data.itemQty;
+                if(data.allItemStatus) {
+                    document.getElementById('payment-status').innerHTML = 'Canceled';
+                    document.getElementById('order-status').innerHTML = 'Canceled';
+                    document.getElementById('cancel-btn').style.display = 'none';
+                    const razorpayPayBtn = document.getElementById('razorpay-pay-btn');
+                    if(razorpayPayBtn) {
+                        razorpayPayBtn.style.display = 'none';
+                    }
+                }
             }
         } catch (error) {
             Swal.fire({
@@ -960,11 +1004,11 @@
                 if(data.success) {
                     const options = {
                         key: data.razorpayId,
-                        amount: data.amount,
-                        currency: data.currency,
+                        amount: data.razorpayOrder.amount,
+                        currency: data.razorpayOrder.currency,
                         name: 'GYM CLUB',
                         description: 'Test Transaction',
-                        order_id: data.razorpayOrderId,
+                        order_id: data.razorpayOrder.id,
                         theme: {
                             color: '#F37254'
                         },
@@ -1015,7 +1059,6 @@
                                         throw new Error(PayStatus.message || 'Payment status fetch error');
                                     }
                                     if(PayStatus.success) {
-                                        // alert('success')
                                         document.getElementById('payment-status').innerHTML = PayStatus.paymentStatus;
                                     }   
                                 } catch (error) {
